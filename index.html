@@ -1,0 +1,2562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acompanhamento · Daluminium</title>
+<style>
+:root{--cor:#C2255C;--cor-dark:#A61E4D;--cor-light:#FCE8EF;--red:#C0392B;--red-light:#FDF0EE;--amber:#B9770E;--amber-light:#FEF7E6;--green:#1A7A45;--green-light:#EDFAF3;--gray-1:#F7F8F9;--gray-2:#EEF0F2;--gray-3:#DEE1E5;--gray-4:#9AA1AB;--gray-5:#5A6370;--gray-6:#23282F;--radius:8px;--shadow:0 1px 4px rgba(0,0,0,0.07),0 0 0 0.5px rgba(0,0,0,0.05)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gray-1);color:var(--gray-6);font-size:14px;min-height:100vh}
+.topbar{background:var(--cor-dark);color:#fff;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:50;box-shadow:0 1px 6px rgba(0,0,0,.15);gap:8px}
+.topbar-logo{font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:0}
+.topbar-logo span{opacity:.75;font-weight:400;font-size:13px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+#sync{font-size:12px;color:rgba(255,255,255,.85);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;border-radius:var(--radius);border:1px solid transparent;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;white-space:nowrap}
+.btn-ghost{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)}
+.btn-outline{background:#fff;color:var(--gray-6);border-color:var(--gray-3)}.btn-outline:hover{background:var(--gray-1)}
+.btn-cor{background:var(--cor);color:#fff;border-color:var(--cor-dark)}.btn-cor:hover{background:var(--cor-dark)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn[disabled]{opacity:.5;cursor:default}
+.main{max-width:1100px;margin:0 auto;padding:1rem 1rem 6rem}
+.busca{width:100%;padding:9px 12px;border:1px solid var(--gray-3);border-radius:var(--radius);font-family:inherit;font-size:14px;background:#fff;margin-bottom:12px}
+.lista-obras{display:flex;flex-direction:column;gap:8px}
+.obra-linha{background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:10px 14px;display:flex;gap:12px;align-items:center;cursor:pointer;border-left:4px solid var(--gray-3)}
+.obra-linha:hover{background:var(--cor-light)}
+.obra-linha.tem-med{border-left-color:var(--cor)}
+.obra-ct{font-weight:700;font-size:13px;color:var(--cor-dark);min-width:48px}
+.obra-nome{font-weight:600;flex:1;min-width:0}
+.obra-sub{font-size:12px;color:var(--gray-5);margin-top:2px}
+.pill{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:600;background:var(--gray-2);color:var(--gray-5);white-space:nowrap}
+.pill-cor{background:var(--cor-light);color:var(--cor-dark)}
+.pill-verde{background:var(--green-light);color:var(--green)}
+.pill-ambar{background:var(--amber-light);color:var(--amber)}
+.pill-verm{background:var(--red-light);color:var(--red)}
+.vazio{text-align:center;color:var(--gray-4);padding:30px 10px;font-style:italic}
+.cab{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;margin-bottom:12px}
+.cab-topo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cab-titulo{font-size:18px;font-weight:700;flex:1;min-width:0}
+.cab-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 16px}
+.cab-item label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-4)}
+.cab-item div{font-size:13.5px;margin-top:1px;word-break:break-word}
+.cab-item .falta{color:var(--gray-4);font-style:italic}
+.avisos{margin:10px 0 0;display:flex;flex-direction:column;gap:6px}
+.aviso-linha{border-radius:8px;padding:8px 12px;font-size:13px;line-height:1.5}
+.aviso-ambar{background:var(--amber-light);color:#7a4e07;border:1px solid #F5D98A}
+.aviso-azul{background:var(--cor-light);color:var(--cor-dark);border:1px solid #F3C4D4}
+.aviso-verm{background:var(--red-light);color:var(--red);border:1px solid #F3C7C1}
+.ficha{background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;border:2px solid transparent}
+.ficha.suja{border-color:var(--amber)}
+.ficha-topo{display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--cor-light);flex-wrap:wrap}
+.ficha-topo .tipo{font-size:17px;font-weight:800;color:var(--cor-dark)}
+.ficha-corpo{padding:12px 14px;display:grid;grid-template-columns:200px 1fr;gap:14px}
+.desenho{background:var(--gray-1);border:1px solid var(--gray-2);border-radius:8px;min-height:120px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--gray-4);text-align:center;padding:4px}
+.desenho img{max-width:100%;height:auto;display:block}
+.proj{font-size:12.5px;line-height:1.55;color:var(--gray-5);margin-top:8px}
+.proj b{color:var(--gray-6)}
+.secao{margin-top:12px}
+.secao h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-5);margin-bottom:6px}
+.grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grade2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fg label{display:block;font-size:11.5px;color:var(--gray-5);margin-bottom:3px}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 9px;border:1px solid var(--gray-3);border-radius:7px;font-family:inherit;font-size:14px;background:#fff}
+.fg textarea{min-height:64px;resize:vertical}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--cor)}
+.fg input.mudou,.fg select.mudou,.fg textarea.mudou{background:#FFFBEA;border-color:var(--amber)}
+.resultado{background:var(--green-light);border-radius:8px;padding:8px 12px;font-size:13.5px;color:#14532d;margin-top:8px}
+.resultado.incompleto{background:var(--gray-2);color:var(--gray-5)}
+.faltas{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:13px}
+.faltas label{display:flex;align-items:center;gap:5px;cursor:pointer}
+.nota-pdf{background:#FFF8E1;border-left:3px solid var(--amber);padding:6px 10px;border-radius:4px;font-size:12.5px;margin-top:6px}
+.nota-pdf.conjunto{background:#FDECEA;border-left-color:var(--red)}
+.depois{font-size:12px;color:var(--gray-4);font-style:italic}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.foto{position:relative;background:var(--gray-1);border:1px solid var(--gray-2);border-radius:8px;overflow:hidden}
+.foto img{display:block;width:100%;height:110px;object-fit:cover;cursor:zoom-in;background:var(--gray-2)}
+.foto-leg{font-size:10.5px;color:var(--gray-5);padding:4px 6px;line-height:1.35}
+.foto-leg a{color:var(--cor-dark)}
+.foto-x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:16px;line-height:26px;cursor:pointer}
+.midia-botoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.midia-botoes label.btn{cursor:pointer}
+.audio-linha{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.audio-info{font-size:12px;color:var(--gray-5)}
+.croquis-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px}
+.croqui-cel{border:1px solid var(--gray-3);border-radius:8px;background:#fff;padding:4px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:stretch;gap:3px}
+.croqui-cel:hover{border-color:var(--cor);background:var(--cor-light)}
+.croqui-cel img{width:100%;aspect-ratio:4/3;object-fit:contain;background:var(--gray-1)}
+.croqui-falta{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:var(--gray-1);color:var(--gray-4);font-size:10.5px;font-style:italic}
+.croqui-cel span{font-size:10.5px;color:var(--gray-5);word-break:break-all;line-height:1.25}
+.croqui-nome{font-size:11px;color:var(--gray-5);margin-top:4px;word-break:break-all}
+.pdf-botoes{display:flex;gap:8px;flex-wrap:wrap}
+#visita-pe .pdf-botoes{width:100%;margin-bottom:4px}
+.foto-rel{display:block;width:100%;border:0;border-top:1px solid var(--gray-2);background:#fff;color:var(--gray-5);font-size:11px;padding:5px;cursor:pointer;font-family:inherit;text-align:center}
+.foto-rel.on{background:#FFF4D6;color:#7a4e07;font-weight:700}
+.visita-linha{border-top:1px solid var(--gray-2);padding:9px 2px;cursor:pointer;font-size:13.5px}
+.visita-linha:hover{background:var(--cor-light)}
+.vv-linha{display:grid;grid-template-columns:110px 150px 1fr;gap:8px;align-items:center;margin-bottom:6px}
+.vv-tipo{font-size:13px}.vv-tipo span{font-size:11.5px;color:var(--gray-5)}
+.grade-visita{grid-template-columns:1fr 1fr 1.4fr}
+@media (max-width:560px){ .vv-linha{grid-template-columns:1fr 1fr} .vv-linha .fg:last-child{grid-column:1 / -1}
+  .grade-visita{grid-template-columns:1fr 1fr} .grade-visita .fg:last-child{grid-column:1 / -1} }
+.btn.gravando{animation:pisca 1s infinite}
+@keyframes pisca{50%{opacity:.6}}
+.hist{font-size:12px;color:var(--gray-5);max-height:160px;overflow:auto;border-top:1px dashed var(--gray-3);margin-top:10px;padding-top:6px}
+.barra-salvar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--amber);padding:10px 16px;display:none;align-items:center;justify-content:center;gap:12px;z-index:60;box-shadow:0 -2px 10px rgba(0,0,0,.1);flex-wrap:wrap}
+.barra-salvar.visivel{display:flex}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:.6rem}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;width:min(480px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal-head{padding:14px 18px;border-bottom:1px solid var(--gray-2)}
+.modal-title{font-size:15px;font-weight:700}
+.modal-body{padding:14px 18px}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--gray-2);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.escolha{border:1px solid var(--gray-3);border-radius:8px;padding:10px;margin-top:8px;cursor:pointer}
+.escolha:hover{border-color:var(--cor);background:var(--cor-light)}
+.bloqueio{display:flex;align-items:center;justify-content:center;min-height:80vh;padding:24px;text-align:center;color:var(--gray-5)}
+@media (max-width:700px){
+  .ficha-corpo{grid-template-columns:1fr}
+  .desenho{max-width:260px;margin:0 auto;width:100%}
+  .topbar-logo span{display:none}
+  .grade{gap:6px}
+}
+@media (max-width:480px){
+  .topbar{padding:0 .6rem}
+  .topbar-logo{font-size:15px;white-space:nowrap}
+  .topbar-actions{gap:5px}
+  #sync{font-size:10.5px;max-width:84px;white-space:normal;line-height:1.2;text-align:right}
+}
+</style>
+<script>
+// ---- MODO ESPELHO ("Ver como", pedido do Ander, 16/10/2026) ----
+// Mesmo bloco dos outros modulos: na aba em que o admin ve o sistema como
+// outra pessoa, nada le, grava nem apaga o armazenamento que as abas dividem.
+try{ if(sessionStorage.getItem('dalum-espelho')){ (function(){
+  const L=window.localStorage, P=Storage.prototype, ler=P.getItem, gravar=P.setItem, tirar=P.removeItem, limpar=P.clear;
+  P.getItem=function(k){ return this===L?null:ler.call(this,k); };
+  P.setItem=function(k,v){ if(this!==L) return gravar.call(this,k,v); };
+  P.removeItem=function(k){ if(this!==L) return tirar.call(this,k); };
+  P.clear=function(){ if(this!==L) return limpar.call(this); };
+})(); } }catch(e){}
+
+// Marca que este modulo esta aberto DENTRO do portal, para o CSS esconder a
+// faixa duplicada.
+try{ if(window.self!==window.top) document.documentElement.classList.add('dentro-do-portal'); }
+catch(e){ document.documentElement.classList.add('dentro-do-portal'); }
+</script>
+</head>
+<body>
+<div class="bloqueio" id="bloqueio">Abrindo...</div>
+
+<div id="app" style="display:none">
+  <div class="topbar">
+    <div class="topbar-logo">&#128208; Acompanhamento <span>medição de vãos</span></div>
+    <div class="topbar-actions">
+      <span id="sync"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-voltar" style="display:none" onclick="voltarParaLista()">&larr; Obras</button>
+      <button class="btn btn-ghost btn-sm" id="btn-sair" onclick="sairDoModulo()">Sair</button>
+    </div>
+  </div>
+  <div class="main" id="tela"></div>
+</div>
+
+<div class="barra-salvar" id="barra-salvar">
+  <span id="barra-salvar-txt" style="font-size:13.5px;font-weight:600;color:#7a4e07">Há medidas não salvas</span>
+  <button class="btn btn-outline" onclick="descartarRascunho()">Descartar</button>
+  <button class="btn btn-cor" id="btn-salvar" onclick="salvarObra()">&#128190; Salvar</button>
+</div>
+
+<div class="overlay" id="aviso-ov" style="z-index:400">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="aviso-titulo">Aviso</div></div>
+    <div class="modal-body"><div id="aviso-texto" style="font-size:13.5px;line-height:1.6;white-space:pre-line"></div></div>
+    <div class="modal-foot"><button class="btn btn-cor" id="aviso-btn" onclick="fecharAviso()">Entendi</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="visita-ov" style="z-index:300">
+  <div class="modal" style="width:min(680px,100%)">
+    <div class="modal-head"><div class="modal-title" id="visita-titulo">Registrar visita</div></div>
+    <div class="modal-body" id="visita-corpo"></div>
+    <div class="modal-foot" id="visita-pe"></div>
+  </div>
+</div>
+
+<div class="overlay" id="croqui-ov" style="z-index:310">
+  <div class="modal" style="width:min(820px,100%)">
+    <div class="modal-head" style="display:flex;align-items:center;gap:8px"><div class="modal-title" style="flex:1">Croquis</div>
+      <button class="btn btn-outline btn-sm" onclick="fecharEscolhaCroqui()">Fechar</button></div>
+    <div class="modal-body" id="croqui-corpo"></div>
+  </div>
+</div>
+
+<div class="overlay" id="escolha-ov" style="z-index:410">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title" id="escolha-titulo">Duas pessoas mudaram o mesmo campo</div></div>
+    <div class="modal-body" id="escolha-corpo"></div>
+  </div>
+</div>
+
+<script>
+// ================= CONFIG =================
+const WORKER='https://daluminium-api.daluminium2.workers.dev';
+// Identificador do sistema no banco: SEM acento (vai num cabecalho HTTP).
+// Producao: 'acompanhamento'.
+const SUPA_SISTEMA='acompanhamento';
+// ATENCAO: muda de teste para producao, igual ao SUPA_SISTEMA acima.
+// Producao: https://daluminium.github.io/portal/
+const PORTAL_URL='https://daluminium.github.io/portal/';
+// Deriva do SUPA_SISTEMA, como na Fabrica e na Obra: menos diferenca para
+// manter entre os dois ambientes.
+const AMBIENTE = /_teste$/.test(SUPA_SISTEMA) ? 'teste' : 'producao';
+const LS_KEY='dalum-acomp';
+const LS_OBRAS='dalum-acomp-obras';
+const TOKEN_KEY='dalum-token';
+// Copia local de TODOS os modulos (mesmo endereco, mesmo armazenamento): sair
+// de qualquer um limpa todos. Lista igual a dos outros, mais as deste modulo.
+const DADOS_LOCAIS=['dalum-data','fin-data','dalum-fabrica','dalum-obra','dalum-crm','dalum-crm-para-obra',
+  'portal-admin-passes','dalum-admin-passes','fin-admin-passes',LS_KEY,LS_OBRAS];
+
+// Etapas de cada esquadria. O id NUNCA muda (fica gravado na ficha).
+const ETAPAS=[
+  {id:'medir',    nome:'A medir'},
+  {id:'campo',    nome:'Medido em campo'},
+  {id:'tecnico',  nome:'No técnico'},
+  {id:'producao', nome:'Liberado para produção'}
+];
+const FALTAS=[
+  {id:'reboco', nome:'Reboco'},
+  {id:'contrapiso', nome:'Contrapiso'},
+  {id:'revestimento', nome:'Revestimento'},
+  {id:'prumo', nome:'Prumo / esquadro'},
+  {id:'outro', nome:'Outro'}
+];
+// Os campos que a pessoa digita em cada esquadria. E por esta lista que a
+// gravacao junta campo a campo o que eu mudei e o que um colega mudou.
+const CAMPOS_FICHA={
+  tipo:'Tipo', local:'Localização',
+  lCima:'Largura em cima', lMeio:'Largura no meio', lBaixo:'Largura embaixo',
+  hEsq:'Altura à esquerda', hCentro:'Altura no centro', hDir:'Altura à direita',
+  d1:'Diagonal 1', d2:'Diagonal 2',
+  condicao:'Condição do vão', faltas:'O que falta', faltaOutro:'Outro (o que falta)',
+  obs:'Observações', folgaL:'Folga L', folgaH:'Folga H', etapa:'Etapa'
+};
+
+let dados={acompanhamentos:[],historico:[]};
+let obras=[];             // recorte da Obra que o Worker entrega
+let usuario='', papel='';
+let obraAberta=null;      // id do contrato (da Obra) aberto na tela
+// Rascunho: o que foi digitado e ainda nao foi salvo, por esquadria e campo.
+// Base: como cada esquadria estava quando a tela foi montada — e a referencia
+// para saber o que EU mudei e o que um colega mudou (mesma ideia da Fabrica).
+let rascunho={}, baseFichas={};
+let _gravando=0, _versaoLocal=0;
+
+// ================= UTILIDADES =================
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function novoId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function agoraISO(){ return new Date().toISOString(); }
+function agoraHora(){ return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function fmtData(d){ if(!d) return ''; const p=String(d).slice(0,10).split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d; }
+// Data LOCAL (AAAA-MM-DD) de um carimbo gravado em hora internacional. Cortar
+// o texto do carimbo dava o dia seguinte depois das 20h em Porto Velho.
+function diaLocal(iso){
+  const d=new Date(iso); if(isNaN(d)) return String(iso||'').slice(0,10);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtQuando(iso){ if(!iso) return ''; const d=new Date(iso); return isNaN(d)?iso:d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function semAcento(t){ return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function copia(o){ return JSON.parse(JSON.stringify(o)); }
+function status(txt,cor){ const e=document.getElementById('sync'); if(e){ e.textContent=txt; e.style.color=cor||'rgba(255,255,255,.85)'; } }
+// Numero em milimetros: aceita "2.900", "2900", "2900,5". Vazio ou zero = sem medida.
+function mm(v){ const n=parseFloat(String(v==null?'':v).replace(/\./g,'').replace(',','.')); return isFinite(n)&&n>0?n:null; }
+
+// ================= AVISOS NA TELA =================
+let _avisoAoFechar=null;
+function aviso(titulo, texto, aoFechar){
+  document.getElementById('aviso-titulo').textContent=titulo||'Aviso';
+  document.getElementById('aviso-texto').textContent=texto||'';
+  _avisoAoFechar=aoFechar||null;
+  document.getElementById('aviso-ov').classList.add('open');
+  setTimeout(function(){ const b=document.getElementById('aviso-btn'); if(b) b.focus(); },60);
+}
+function fecharAviso(){
+  document.getElementById('aviso-ov').classList.remove('open');
+  const fn=_avisoAoFechar; _avisoAoFechar=null;
+  if(fn) fn();
+}
+
+// ================= CRACHA E SESSAO (igual aos outros modulos) =================
+function loginGuardaLer(chave){
+  try{ const v=sessionStorage.getItem(chave); if(v!==null) return v; }catch(e){}
+  try{ return localStorage.getItem(chave); }catch(e){ return null; }
+}
+function loginGuardaApagar(chave){
+  let meu=null;
+  try{ meu=sessionStorage.getItem(chave); }catch(e){}
+  try{ sessionStorage.removeItem(chave); }catch(e){}
+  try{ if(meu===null || localStorage.getItem(chave)===meu) localStorage.removeItem(chave); }catch(e){}
+}
+function lerSSO(){
+  try{
+    const s=JSON.parse(loginGuardaLer('dalum-sso')||'null');
+    if(!s||!s.nome) return null;
+    if(Date.now()-s.ts>8*60*60*1000){ loginGuardaApagar('dalum-sso'); return null; }
+    return s;
+  }catch(e){ return null; }
+}
+function b64urlParaTexto(s){
+  const b64=s.replace(/-/g,'+').replace(/_/g,'/');
+  const bin=atob(b64+'==='.slice((b64.length+3)%4));
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function lerToken(){
+  try{
+    const t=loginGuardaLer(TOKEN_KEY);
+    if(!t) return null;
+    const partes=t.split('.');
+    if(partes.length!==2) return null;
+    const d=JSON.parse(b64urlParaTexto(partes[0]));
+    if(!d||!d.exp||Date.now()>=d.exp){ loginGuardaApagar(TOKEN_KEY); return null; }
+    return {token:t,dados:d};
+  }catch(e){ loginGuardaApagar(TOKEN_KEY); return null; }
+}
+function cabecalhos(extra){
+  const h=Object.assign({'X-Sistema':SUPA_SISTEMA},extra||{});
+  const t=lerToken();
+  if(t) h['Authorization']='Bearer '+t.token;
+  return h;
+}
+function apagarDadosLocais(){ DADOS_LOCAIS.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} }); }
+function soAdmin(){ return papel==='admin'; }
+// Consulta, ou o Acompanhamento marcado "so ver" no cadastro da pessoa: so
+// olha. Quem trava de verdade e o Worker; aqui a tela so evita que a pessoa
+// digite e perca.
+function ehConsulta(){
+  if(papel==='consulta') return true;
+  try{ const t=lerToken(); const v=(t&&t.dados&&Array.isArray(t.dados.v))?t.dados.v:[]; return v.indexOf('acompanhamento')>=0; }catch(e){ return false; }
+}
+function recusarSeConsulta(){
+  try{ if(sessionStorage.getItem('dalum-espelho')){
+    aviso('Modo espelho','Você está vendo o sistema como outra pessoa, só para olhar.\n\nNada foi gravado.');
+    return true;
+  } }catch(e){}
+  if(!ehConsulta()) return false;
+  aviso('Modo consulta','Você pode olhar, mas não alterar.\n\nA alteração não foi salva.');
+  return true;
+}
+
+let _sessionId=(function(){
+  try{
+    let i=sessionStorage.getItem('dalum-sessao');
+    if(!i){ i=Math.random().toString(36).slice(2)+Date.now().toString(36); sessionStorage.setItem('dalum-sessao',i); }
+    return i;
+  }catch(e){ return 'tela'+Date.now(); }
+})();
+async function acaoSessao(nome, corpo){
+  const r=await fetch(WORKER,{method:'POST',
+    headers:Object.assign(cabecalhos({'Content-Type':'application/json','X-Action':nome}),{'X-Sistema':'sessions'}),
+    body:JSON.stringify(Object.assign({sessionId:_sessionId, ambiente:AMBIENTE}, corpo||{}))});
+  if(!r.ok) throw new Error('worker '+r.status);
+  return r.json();
+}
+let _checkSessao=null;
+async function checkForceLogout(){
+  let r=null;
+  try{ r=await acaoSessao('sessao-sinal',{sistema:'acompanhamento'}); }catch(e){ return; }
+  if(!r||!r.derrubado) return;
+  alert(r.motivo==='outro-login'
+    ?'Sua sessão foi encerrada porque este usuário entrou em outro navegador.'
+    :'Sua sessão foi encerrada pelo administrador.');
+  loginGuardaApagar(TOKEN_KEY); loginGuardaApagar('dalum-sso'); apagarDadosLocais();
+  location.reload();
+}
+async function sairDoModulo(){
+  if(temRascunho() && !confirm('Há medidas não salvas. Sair mesmo assim?')) return;
+  if(!temRascunho() && !confirm('Deseja sair?')) return;
+  try{ await acaoSessao('sessao-sair',{}); }catch(e){}
+  loginGuardaApagar(TOKEN_KEY); loginGuardaApagar('dalum-sso'); apagarDadosLocais();
+  rascunho={};
+  if(window.self!==window.top) window.parent.postMessage('logout','*');
+  location.reload();
+}
+function sessaoExpirada(){
+  if(window.__sessaoExpirada) return;
+  window.__sessaoExpirada=true;
+  try{ loginGuardaApagar(TOKEN_KEY); loginGuardaApagar('dalum-sso'); }catch(e){} apagarDadosLocais();
+  aviso('Sessão expirada','O acesso vale 8 horas e o seu venceu. O que você já tinha salvo continua guardado.\n\nVamos voltar para a tela de entrada.',
+    function(){
+      if(window.self!==window.top){ try{ window.parent.postMessage('logout','*'); }catch(e){} setTimeout(function(){ location.reload(); },800); return; }
+      location.reload();
+    });
+}
+function telaBloqueio(titulo, texto){
+  document.getElementById('app').style.display='none';
+  const b=document.getElementById('bloqueio');
+  b.style.display='flex';
+  b.innerHTML='<div style="max-width:480px"><div style="font-size:42px;margin-bottom:12px">&#128274;</div>'+
+    '<h1 style="font-size:19px;color:#1f2937;margin-bottom:10px">'+esc(titulo)+'</h1>'+
+    '<p style="line-height:1.6">'+esc(texto)+'</p></div>';
+}
+
+// ---- AVISO DE VERSAO NOVA (igual aos outros modulos) ----
+let _versaoQuandoAbriu=null, _avisouVersaoNova=false;
+async function conferirVersao(){
+  if(_avisouVersaoNova) return;
+  let v=null;
+  try{
+    const base=(AMBIENTE==='teste')?'https://daluminium.github.io/teste/versao.json':'https://daluminium.github.io/portal/versao.json';
+    const r=await fetch(base+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return;
+    v=(await r.json()).versao;
+  }catch(e){ return; }
+  if(!v) return;
+  if(_versaoQuandoAbriu===null){ _versaoQuandoAbriu=v; return; }
+  if(v===_versaoQuandoAbriu) return;
+  _avisouVersaoNova=true;
+  const b=document.createElement('div');
+  b.style.cssText='position:fixed;left:0;right:0;top:0;z-index:10050;background:#FFFBEA;border-bottom:2px solid #E6B800;'+
+    'font-size:13.5px;padding:10px 14px;display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap';
+  b.innerHTML='<span><b>Saiu uma versão nova do sistema.</b> Salve o que estiver digitando e atualize a página.</span>'+
+    '<button type="button" class="btn btn-cor btn-sm" id="barra-versao-ok">Atualizar agora</button>'+
+    '<button type="button" class="btn btn-outline btn-sm" id="barra-versao-x">Agora não</button>';
+  document.body.appendChild(b);
+  b.querySelector('#barra-versao-ok').onclick=function(){
+    if(temRascunho() && !confirm('Há medidas não salvas. Atualizar mesmo assim?')) return;
+    try{ if(window.self!==window.top){ window.parent.postMessage('atualizar-versao','*'); return; } }catch(e){}
+    location.replace(location.pathname+'?v='+encodeURIComponent(v));
+  };
+  b.querySelector('#barra-versao-x').onclick=function(){ b.remove(); };
+}
+setTimeout(conferirVersao,1500);
+setInterval(conferirVersao,5*60*1000);
+
+// ================= DADOS DO PROPRIO MODULO =================
+// Ler sempre sem cache: no-store e um parametro que muda a cada chamada.
+async function buscarRemoto(){
+  const r=await fetch(WORKER+'?t='+Date.now()+'-'+Math.random().toString(36).slice(2,7),{cache:'no-store',headers:cabecalhos()});
+  if(r.status===503){ telaBloqueio('Sistema em manutenção','Estamos ajustando o sistema. Seus dados estão guardados.'); throw new Error('manutencao'); }
+  if(r.status===403){ telaBloqueio('Sem acesso a este módulo','Seu acesso não inclui o Acompanhamento' + (AMBIENTE==='teste'?' (ou este é o ambiente de teste, que é só para administradores e gerentes)':'') + '. Peça ao administrador para liberar.'); throw new Error('Acesso negado'); }
+  if(r.status===401){ sessaoExpirada(); throw new Error('Sessao expirada'); }
+  if(!r.ok) throw new Error('Worker '+r.status);
+  const j=await r.json();
+  if(!j||typeof j!=='object'||Array.isArray(j)) return null;
+  if(!Array.isArray(j.acompanhamentos)) j.acompanhamentos=[];
+  if(!Array.isArray(j.historico)) j.historico=[];
+  return j;
+}
+// A Obra, pelo recorte do Worker: so cabecalho e anexos de medicao. Sem CPF,
+// sem valor. O Acompanhamento nunca grava na Obra.
+async function buscarObras(){
+  const r=await fetch(WORKER+'?t='+Date.now()+'-'+Math.random().toString(36).slice(2,7),{cache:'no-store',
+    headers:cabecalhos({'X-Action':'obras-do-acompanhamento'})});
+  if(r.status===401){ sessaoExpirada(); throw new Error('Sessao expirada'); }
+  if(!r.ok) throw new Error('Obra '+r.status);
+  const j=await r.json();
+  return (j&&Array.isArray(j.contratos))?j.contratos:[];
+}
+// GRAVACAO CONDICIONAL (20/10/2026): manda a versao que leu (X-Base). Se outra
+// pessoa gravou no meio, o Worker responde 409 e nada e gravado por cima.
+async function enviarRemoto(payload, versaoLida){
+  const extra={'Content-Type':'application/json'};
+  if(versaoLida) extra['X-Base']=versaoLida;
+  const r=await fetch(WORKER,{method:'PATCH',headers:cabecalhos(extra),body:JSON.stringify({data:payload})});
+  if(r.status===401){ sessaoExpirada(); throw new Error('Sessao expirada'); }
+  if(r.status===409) return 'conflito';
+  if(!r.ok) throw new Error('Worker '+r.status);
+  return 'ok';
+}
+function logGeral(base, acao, alvo, detalhe){
+  if(!Array.isArray(base.historico)) base.historico=[];
+  base.historico.unshift({id:novoId(), ts:agoraISO(), user:usuario||'—', acao:acao, alvo:alvo||'—', detalhe:detalhe||''});
+  if(base.historico.length>500) base.historico=base.historico.slice(0,500);
+}
+function lerLocal(){
+  try{ const s=localStorage.getItem(LS_KEY); if(s) dados=JSON.parse(s); }catch(e){}
+  if(!dados||typeof dados!=='object') dados={};
+  if(!Array.isArray(dados.acompanhamentos)) dados.acompanhamentos=[];
+  try{ const o=JSON.parse(localStorage.getItem(LS_OBRAS)||'null'); if(Array.isArray(o)) obras=o; }catch(e){}
+}
+function gravarLocal(){
+  try{ localStorage.setItem(LS_KEY,JSON.stringify(dados)); localStorage.setItem(LS_OBRAS,JSON.stringify(obras)); }catch(e){}
+}
+
+// Toda alteracao passa por aqui: rele o banco, aplica a mudanca em cima do que
+// esta la e grava com X-Base. Confere depois pelo carimbo, porque o Worker ja
+// respondeu "ok" sem gravar (registro inexistente).
+async function alterar(fn, registro){
+  if(recusarSeConsulta()) return false;
+  _versaoLocal++; _gravando++;
+  try{ return await gravarAlteracao(fn, registro); }
+  finally{ _gravando--; }
+}
+async function gravarAlteracao(fn, registro){
+  status('🔄 Salvando...');
+  try{
+    let base=null, carimbo='';
+    for(let tentativa=0; tentativa<4; tentativa++){
+      base=null;
+      try{ base=await buscarRemoto(); }catch(e){ base=null; }
+      // Sem conseguir ler o banco NAO grava: gravar a copia local por cima
+      // poderia apagar o que um colega salvou.
+      if(!base) throw new Error('sem leitura');
+      const versaoLida=String(base.atualizadoEm||'');
+      const ok=await fn(base);
+      if(ok===false){ status('🟡 Nada salvo'); return false; }
+      if(registro){
+        try{ const r=(typeof registro==='function')?registro(base):registro; if(r&&r.acao) logGeral(base,r.acao,r.alvo,r.detalhe); }catch(e){}
+      }
+      carimbo=agoraISO();
+      base.atualizadoEm=carimbo; base.atualizadoPor=usuario;
+      const deu=await enviarRemoto(base, versaoLida);
+      if(deu!=='conflito') break;
+      status('🔀 Outra pessoa salvou junto — juntando...');
+      if(tentativa===3) throw new Error('conflito');
+      await new Promise(function(ok){ setTimeout(ok,300+Math.random()*700); });
+    }
+    let confere=null;
+    try{ confere=await buscarRemoto(); }catch(e){ confere=null; }
+    const depoisDeMim=!!confere && confere.atualizadoEm!==carimbo &&
+      new Date(confere.atualizadoEm).getTime()>new Date(carimbo).getTime();
+    if(!confere || (confere.atualizadoEm!==carimbo && !depoisDeMim)){
+      status('🔴 NÃO gravou no servidor','#ffcccc');
+      aviso('As medidas NÃO foram salvas','O servidor respondeu que deu certo, mas ao conferir, a informação não estava lá.\n\n'+
+        'Não continue: avise o responsável pelo sistema. O que você digitou continua na tela.');
+      return false;
+    }
+    dados=confere; gravarLocal();
+    status('🟢 Salvo · '+agoraHora());
+    return true;
+  }catch(e){
+    status('🔴 Não salvou','#ffcccc');
+    aviso('Não foi possível salvar','Verifique a internet e tente de novo.\n\nNada foi perdido: o que você digitou continua na tela.');
+    return false;
+  }
+}
+
+async function sincronizar(manual){
+  if(_gravando) return;
+  const versao=_versaoLocal;
+  status('🔄 Buscando...');
+  try{
+    const [d,o]=await Promise.all([buscarRemoto(), buscarObras()]);
+    // Uma gravacao comecou enquanto esta leitura estava no caminho: a leitura
+    // e velha, descarta.
+    if(_gravando || versao!==_versaoLocal) return;
+    if(d) dados=d;
+    obras=o||[];
+    gravarLocal();
+    // Sem nada digitado, a referencia das fichas passa a ser o que veio agora.
+    if(!temRascunho()) baseFichas={};
+    render();
+    status('🟢 Atualizado · '+agoraHora());
+  }catch(e){
+    if(!document.getElementById('app').style.display) render();
+    status('🔴 Sem conexão — dados locais','#ffcccc');
+  }
+}
+
+// ================= O PDF DO SMARTCEM =================
+const PDFJS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDFJS_SELO='sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e';
+const PDFJS_AJUDANTE_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const PDFJS_AJUDANTE_SELO='sha384-SnzOobpRMLXZ52iJvZm/C0fYw0OQemTXzTjIsdsfMcrCtCEe9qgzxTd3RSklO5x2';
+let _pdfjs=null;
+function carregarPdfJs(){
+  if(_pdfjs) return _pdfjs;
+  _pdfjs=new Promise(function(ok,falhou){
+    const s=document.createElement('script');
+    s.src=PDFJS_URL; s.integrity=PDFJS_SELO; s.crossOrigin='anonymous';
+    s.onload=async function(){
+      try{
+        const lib=window.pdfjsLib;
+        if(!lib) throw new Error('o leitor de PDF não carregou direito');
+        const r=await fetch(PDFJS_AJUDANTE_URL,{integrity:PDFJS_AJUDANTE_SELO,mode:'cors'});
+        if(!r.ok) throw new Error('não consegui baixar o leitor de PDF');
+        lib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([await r.text()],{type:'text/javascript'}));
+        ok(lib);
+      }catch(e){ _pdfjs=null; falhou(e); }
+    };
+    s.onerror=function(){ _pdfjs=null; falhou(new Error('não consegui baixar o leitor de PDF (confira a internet)')); };
+    document.head.appendChild(s);
+  });
+  return _pdfjs;
+}
+// O anexo e privado: o Worker devolve um link que vale 1 minuto.
+// modo 'miniatura' (so foto do vao): abre sem anotar na Auditoria; 'ver'
+// (padrao) fica anotado como "visualizou anexo".
+async function linkDoAnexo(url,nome,modo){
+  const r=await fetch(WORKER,{method:'POST',cache:'no-store',
+    headers:cabecalhos({'Content-Type':'application/json','X-Action':'abrir-anexo'}),
+    body:JSON.stringify({url:url,nome:nome||'',modo:modo||'ver',para:''})});
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(r.status===401){ sessaoExpirada(); throw new Error('sessão expirada'); }
+  if(!r.ok||!j||!j.url) throw new Error((j&&j.erro)||('erro '+r.status+' no servidor'));
+  return j.abrir||j.url;
+}
+// Um PDF aberto fica guardado na memoria desta tela: os desenhos de todas as
+// esquadrias saem dele sem baixar de novo.
+const _pdfs={};
+function abrirPdf(doc){
+  if(_pdfs[doc.url]) return _pdfs[doc.url];
+  _pdfs[doc.url]=(async function(){
+    const lib=await carregarPdfJs();
+    const u=await linkDoAnexo(doc.url,doc.nome);
+    return lib.getDocument({url:u,disableRange:true,disableStream:true}).promise;
+  })();
+  _pdfs[doc.url].catch(function(){ delete _pdfs[doc.url]; });
+  return _pdfs[doc.url];
+}
+
+// Revisao no fim do numero: R01, RV8, V3 (e V3A, V3B: variantes da V3).
+function revisaoDe(prop){
+  const m=String(prop||'').toUpperCase().match(/[-_ ]?(?:RV?|V)(\d+)[A-Z]?\s*$/);
+  return m?parseInt(m[1],10):0;
+}
+// "ORC-26-02-0055-R01" e "ORC-26-02-0055-R02" sao a mesma proposta.
+function propostaSemRevisao(prop){
+  return String(prop||'').toUpperCase().replace(/\s+/g,'').replace(/[-_]?(?:RV?|V)\d+[A-Z]?$/,'');
+}
+function nomeRev(n){ return 'R'+String(n).padStart(2,'0'); }
+
+// Le um PDF do SmartCEM (Alumisoft) e devolve a(s) proposta(s) e as esquadrias.
+// Cada esquadria e um bloco marcado pelo rotulo "Tipo:". Ha DOIS modelos de
+// impressao (achados em 22/10/2026):
+//  A) "Tipo: | Localizacao: | Dimensoes | Qtde" no TOPO do bloco; descricao,
+//     cor e vidro embaixo (proposta da Caroline).
+//  B) descricao, "Acabamento:" e "Vidros:" em cima e a linha
+//     "Tipo: | Qtd: | L: | H: | Linha: | Localizacao:" no FIM do bloco
+//     (proposta do Pedro Marcelino / Sidney).
+// O modelo e reconhecido bloco a bloco pelos rotulos da linha do "Tipo:".
+// As anotacoes feitas por cima do PDF vem em letra MAIOR que a do SmartCEM
+// (9 pt): no modelo A em 18, no B em 12. Ficam como observacao do bloco onde
+// caem; texto grande fora de qualquer bloco (cabecalho, rodape) e ignorado.
+async function lerSmartCem(doc){
+  const pdf=await abrirPdf(doc);
+  const lib=await carregarPdfJs();
+  const itens=[], imagens=[], alturaPag={};
+  for(let n=1;n<=pdf.numPages;n++){
+    const pg=await pdf.getPage(n);
+    const vp=pg.getViewport({scale:1});
+    alturaPag[n]=vp.height;
+    const tc=await pg.getTextContent();
+    tc.items.forEach(function(it){
+      const t=String(it.str||'').trim();
+      if(!t) return;
+      itens.push({p:n,x:it.transform[4],y:vp.height-it.transform[5],h:it.height||Math.abs(it.transform[3])||0,w:it.width||0,t:t});
+    });
+    const ops=await pg.getOperatorList();
+    let m=[1,0,0,1,0,0]; const pilha=[];
+    const mul=function(a,b){ return [a[0]*b[0]+a[2]*b[1],a[1]*b[0]+a[3]*b[1],a[0]*b[2]+a[2]*b[3],a[1]*b[2]+a[3]*b[3],a[0]*b[4]+a[2]*b[5]+a[4],a[1]*b[4]+a[3]*b[5]+a[5]]; };
+    for(let i=0;i<ops.fnArray.length;i++){
+      const f=ops.fnArray[i];
+      if(f===lib.OPS.save) pilha.push(m.slice());
+      else if(f===lib.OPS.restore) m=pilha.pop()||m;
+      else if(f===lib.OPS.transform) m=mul(m,ops.argsArray[i]);
+      else if(f===lib.OPS.paintImageXObject||f===lib.OPS.paintInlineImageXObject||f===lib.OPS.paintJpegXObject){
+        const w=Math.abs(m[0]), h=Math.abs(m[3]);
+        imagens.push({p:n,x:Math.min(m[4],m[4]+m[0]),y:vp.height-Math.max(m[5],m[5]+m[3]),w:w,h:h});
+      }
+    }
+  }
+  const igual=function(a,b){ return Math.abs(a-b)<=4; };
+  const LETRA_ANOTACAO=10.5;   // o SmartCEM escreve em 9 pt (rodape 7-8)
+  // Propostas citadas no PDF (um PDF pode juntar varias: V3, V3A, V3B...).
+  const propostas=[];
+  itens.forEach(function(i){
+    (i.t.toUpperCase().match(/ORC-[\w-]*\w/g)||[]).forEach(function(pr){ if(propostas.indexOf(pr)<0) propostas.push(pr); });
+  });
+  const prop=propostas[0]||'';
+  // Nome do cliente no cabecalho ("Cliente:" e o valor na mesma linha). Serve
+  // para avisar quando o PDF anexado e de outro cliente.
+  let clientePdf='';
+  const rotCli=itens.find(function(i){ return /^cliente:?$/i.test(i.t); });
+  if(rotCli){
+    clientePdf=itens.filter(function(i){ return i.p===rotCli.p && Math.abs(i.y-rotCli.y)<=4 && i.x>rotCli.x && i.x<rotCli.x+300 && i.h<LETRA_ANOTACAO && !/:$/.test(i.t); })
+      .sort(function(a,b){ return a.x-b.x; }).map(function(i){ return i.t; }).join(' ').trim();
+  }
+  const rotulos=itens.filter(function(i){ return /^tipo:?$/i.test(i.t); })
+    .sort(function(a,b){ return a.p-b.p || a.y-b.y; });
+  // Onde comeca o conteudo de cada pagina: depois do cabecalho da proposta.
+  const CABECALHO=/^(prazo de execu|validade|emitido por|obra:|proposta|cliente:|contato:|end\. obra|cidade:|cep:|cpf:|telefone:|e-mail:)/i;
+  const inicioPagina={};
+  rotulos.forEach(function(r){
+    if(inicioPagina[r.p]!==undefined) return;
+    const cab=itens.filter(function(i){ return i.p===r.p && i.y<r.y-40 && CABECALHO.test(i.t); });
+    inicioPagina[r.p]=cab.length?Math.max.apply(null,cab.map(function(i){ return i.y; }))+8:0;
+  });
+  const fimPagina=function(p){
+    const rod=itens.filter(function(i){ return i.p===p && /smartcem|alumisoft/i.test(i.t); }).map(function(i){ return i.y; });
+    return (rod.length?Math.min.apply(null,rod):alturaPag[p]||842)-20;
+  };
+  const blocos=rotulos.map(function(r,k){
+    const linha=itens.filter(function(i){ return i.p===r.p && igual(i.y,r.y) && i.x>r.x; });
+    const modeloB=linha.some(function(i){ return /^(l|h|qtd):?$/i.test(i.t); });
+    const ant=rotulos[k-1], prox=rotulos[k+1];
+    if(modeloB){
+      return {r:r,p:r.p,modelo:'B',linha:linha,
+        y0:(ant&&ant.p===r.p)?ant.y+22:inicioPagina[r.p],
+        y1:r.y+22};
+    }
+    return {r:r,p:r.p,modelo:'A',linha:linha,
+      y0:r.y-12, y1:(prox&&prox.p===r.p)?prox.y-12:fimPagina(r.p)};
+  });
+  const noBloco=function(b){ return itens.filter(function(i){ return i.p===b.p && i.y>=b.y0 && i.y<b.y1; }); };
+  // Junta pedacos da mesma linha; sem espaco quando um encosta no outro
+  // ("J0" + "4" = "J04").
+  const juntar=function(lista){
+    let s='', fim=null;
+    lista.forEach(function(i){
+      if(s && !(fim!==null && i.x-fim<1.2)) s+=' ';
+      s+=i.t; fim=i.w?i.x+i.w:null;
+    });
+    return s;
+  };
+  const usados=new Set();
+  const esquadrias=blocos.map(function(b){
+    const its=noBloco(b);
+    const aoLado=function(re){
+      const r=its.find(function(i){ return re.test(i.t); });
+      if(!r) return {txt:'',r:null};
+      usados.add(r);
+      const v=its.filter(function(i){ return igual(i.y,r.y) && i.x>r.x && i.h<LETRA_ANOTACAO; }).sort(function(a,c){ return a.x-c.x; });
+      v.forEach(function(i){ usados.add(i); });
+      return {txt:juntar(v),r:r};
+    };
+    let tipo='', local='', qtde='', dimL='', dimH='', dimTxt='', cor='', vidro='', descricao='', linhaProd='';
+    const linhaValores=its.filter(function(i){ return i.y>b.r.y+6 && i.y<b.r.y+30 && i.h<LETRA_ANOTACAO; });
+    const naColuna=function(de,ate){ return linhaValores.filter(function(i){ return i.x>=de && i.x<ate; }).sort(function(a,c){ return a.x-c.x; }); };
+    linhaValores.forEach(function(i){ usados.add(i); });
+    b.linha.forEach(function(i){ usados.add(i); }); usados.add(b.r);
+    if(b.modelo==='B'){
+      const col=function(re,padrao){ const i=b.linha.find(function(x){ return re.test(x.t); }); return i?i.x:padrao; };
+      const xQtd=col(/^qtd/i,b.r.x+60), xL=col(/^l:?$/i,xQtd+57), xH=col(/^h:?$/i,xL+48), xLin=col(/^linha/i,xH+62), xLoc=col(/^localiza/i,xLin+90);
+      tipo=juntar(naColuna(b.r.x-15,xQtd-6));
+      qtde=juntar(naColuna(xQtd-8,xL-8));
+      dimL=juntar(naColuna(xL-10,xH-8)).replace(/\D/g,'');
+      dimH=juntar(naColuna(xH-10,xLin-10)).replace(/\D/g,'');
+      linhaProd=juntar(naColuna(xLin-10,xLoc-20));
+      local=juntar(naColuna(xLoc-20,99999));
+      dimTxt=dimL&&dimH?dimL+' x '+dimH:'';
+      const ac=aoLado(/^acabamento/i);
+      cor=ac.txt;
+      const vi=aoLado(/^vidros?:?$/i);
+      vidro=vi.txt;
+      if(!vidro){ const sv=its.find(function(i){ return /^sem vidros?$/i.test(i.t); }); if(sv){ vidro='Sem vidros'; usados.add(sv); } }
+      // Descricao: o texto de cima, antes do "Acabamento:" (pode ter varias linhas).
+      const limite=ac.r?ac.r.y-2:b.r.y-2;
+      const desc=its.filter(function(i){
+        return i.y<limite && i.x>=b.r.x-10 && i.h<LETRA_ANOTACAO && !usados.has(i) && !/:$/.test(i.t);
+      }).sort(function(a,c){ return a.y-c.y || a.x-c.x; });
+      const porLinha=[]; desc.forEach(function(i){ const l=porLinha.find(function(x){ return igual(x.y,i.y); }); if(l) l.its.push(i); else porLinha.push({y:i.y,its:[i]}); });
+      descricao=porLinha.map(function(l){ return juntar(l.its); }).join(' ');
+      desc.forEach(function(i){ usados.add(i); });
+    } else {
+      const cab=function(re){ return b.linha.find(function(i){ return re.test(i.t); }); };
+      const cLoc=cab(/^localiza/i), cDim=cab(/^dimens/i), cQtd=cab(/^qtde?/i);
+      const xLoc=cLoc?cLoc.x:b.r.x+90, xDim=cDim?cDim.x:xLoc+110, xQtd=cQtd?cQtd.x:xDim+100;
+      tipo=juntar(naColuna(b.r.x-15,xLoc-10));
+      local=juntar(naColuna(xLoc-15,xDim-10));
+      dimTxt=juntar(naColuna(xDim-15,xQtd-10));
+      qtde=juntar(naColuna(xQtd-15,99999));
+      const dm=dimTxt.match(/(\d+)\s*[xX×]\s*(\d+)/);
+      dimL=dm?dm[1]:''; dimH=dm?dm[2]:'';
+      cor=aoLado(/^cor da esquadria/i).txt;
+      vidro=aoLado(/^vidros?:?$/i).txt;
+      const d=aoLado(/^descri/i);
+      descricao=d.txt;
+      if(d.r){
+        const resto=its.filter(function(i){ return i.y>d.r.y+4 && i.y<d.r.y+50 && i.h<LETRA_ANOTACAO && i.x>=d.r.x-6 && !usados.has(i) && !/:$/.test(i.t); })
+          .sort(function(a,c){ return a.y-c.y || a.x-c.x; });
+        resto.forEach(function(i){ usados.add(i); descricao+=' '+i.t; });
+      }
+    }
+    // Todo o resto em letra normal do bloco e do SmartCEM (areas, rotulos...).
+    its.forEach(function(i){ if(i.h<LETRA_ANOTACAO) usados.add(i); });
+    // Desenho: imagem cujo MEIO esta na coluna da esquerda (antes do "Tipo:")
+    // e dentro do bloco; a mais perto do meio do bloco. Recortada a coluna e
+    // ao bloco — ha desenho que "vaza" para os lados no PDF. O rodape do PDF
+    // (faixa larga a partir da margem) tem o meio fora da coluna.
+    const meioBloco=(b.y0+b.y1)/2;
+    const cand=imagens.filter(function(im){
+      const mx=im.x+im.w/2, my=im.y+im.h/2;
+      return im.p===b.p && im.w>=40 && im.h>=40 && mx<b.r.x && my>=b.y0 && my<b.y1;
+    }).sort(function(a,c){ return Math.abs(a.y+a.h/2-meioBloco)-Math.abs(c.y+c.h/2-meioBloco); })[0]||null;
+    let desenho=null;
+    if(cand){
+      const x0=Math.max(0,cand.x), x1=Math.min(cand.x+cand.w,b.r.x-3);
+      const y0=Math.max(cand.y,b.y0-4), y1=Math.min(cand.y+cand.h,b.y1);
+      if(x1-x0>=30 && y1-y0>=30) desenho={p:cand.p,x:x0,y:y0,w:x1-x0,h:y1-y0};
+    }
+    return {
+      tipo:tipo, local:local, qtde:qtde, linha:linhaProd,
+      dimL:dimL, dimH:dimH, dimTxt:dimTxt,
+      cor:cor, vidro:vidro, descricao:descricao.replace(/\s+/g,' ').trim(),
+      desenho:desenho, notas:[]
+    };
+  });
+  // Anotacoes: texto em letra maior que nao e de nenhum campo e cai DENTRO de
+  // um bloco. Pedacos vizinhos viram uma nota so.
+  const blocoDe=function(i){ return blocos.findIndex(function(b){ return b.p===i.p && i.y>=b.y0 && i.y<b.y1; }); };
+  const soltos=itens.filter(function(i){ return !usados.has(i) && i.h>=LETRA_ANOTACAO && blocoDe(i)>=0; })
+    .sort(function(a,b){ return a.p-b.p || a.y-b.y || a.x-b.x; });
+  const notas=[];
+  soltos.forEach(function(i){
+    const k=blocoDe(i);
+    const ult=notas[notas.length-1];
+    if(ult && ult.k===k && i.y-ult.yFim<=26 && Math.abs(i.x-ult.x)<=60){ ult.t+=' · '+i.t; ult.yFim=i.y; return; }
+    notas.push({k:k,p:i.p,x:i.x,y:i.y,yFim:i.y,t:i.t});
+  });
+  notas.forEach(function(n){
+    // Nota que cita duas ou mais esquadrias (ex.: P2+P3) e de CONJUNTO: vai
+    // para todas as citadas, marcada.
+    // Compara sem o "_" (no PDF aparece "P05_A+P05B"), e so palavra inteira
+    // (P1 nao conta dentro de P10).
+    const sem=function(s){ return String(s||'').toUpperCase().replace(/_/g,''); };
+    const textoNota=sem(n.t);
+    const unicos=[];
+    esquadrias.forEach(function(e){
+      const t=sem(e.tipo); if(!t||unicos.indexOf(e.tipo.toUpperCase())>=0) return;
+      const re=new RegExp('(^|[^A-Z0-9])'+t.replace(/[^A-Z0-9]/g,'\\$&')+'(?![A-Z0-9])');
+      if(re.test(textoNota)) unicos.push(e.tipo.toUpperCase());
+    });
+    if(unicos.length>=2){
+      esquadrias.forEach(function(e){
+        if(unicos.indexOf(e.tipo.toUpperCase())>=0) e.notas.push({texto:n.t,conjunto:unicos});
+      });
+    } else {
+      esquadrias[n.k].notas.push({texto:n.t});
+    }
+  });
+  return {proposta:prop, propostas:propostas, revisao:revisaoDe(prop), cliente:clientePdf, esquadrias:esquadrias};
+}
+
+// Recorta o desenho de uma esquadria da pagina do PDF. Guarda na memoria da
+// tela: o banco guarda so a posicao, nao a imagem (a imagem pesaria em toda
+// gravacao de todas as obras).
+const _desenhos={};
+async function desenhoDe(doc, d){
+  const chave=doc.url+'|'+d.p+'|'+Math.round(d.x)+'|'+Math.round(d.y);
+  if(_desenhos[chave]) return _desenhos[chave];
+  _desenhos[chave]=(async function(){
+    const pdf=await abrirPdf(doc);
+    const pg=await pdf.getPage(d.p);
+    const escala=3;
+    const vp=pg.getViewport({scale:escala});
+    const c=document.createElement('canvas');
+    c.width=Math.floor(vp.width); c.height=Math.floor(vp.height);
+    await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+    const m=3;
+    const sx=Math.max(0,(d.x-m)*escala), sy=Math.max(0,(d.y-m)*escala);
+    const sw=Math.min(c.width-sx,(d.w+2*m)*escala), sh=Math.min(c.height-sy,(d.h+2*m)*escala);
+    const r=document.createElement('canvas');
+    r.width=Math.floor(sw); r.height=Math.floor(sh);
+    r.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,sw,sh);
+    return r.toDataURL('image/png');
+  })();
+  _desenhos[chave].catch(function(){ delete _desenhos[chave]; });
+  return _desenhos[chave];
+}
+
+// ================= FOTOS E AUDIOS (ETAPA 2) =================
+const PASTA_ARQUIVOS='daluminium_acompanhamento';
+// Envio assinado pelo Worker: o arquivo sobe como privado (igual a Obra).
+async function enviarArquivoPrivado(arquivo,tipoRecurso,nome){
+  const r=await fetch(WORKER,{method:'POST',cache:'no-store',
+    headers:cabecalhos({'Content-Type':'application/json','X-Action':'assinar-envio'}),
+    body:JSON.stringify({pasta:PASTA_ARQUIVOS})});
+  let a=null; try{ a=await r.json(); }catch(e){}
+  if(r.status===401){ sessaoExpirada(); throw new Error('sessão expirada'); }
+  if(!r.ok||!a||!a.signature) throw new Error((a&&a.erro)||('o servidor não autorizou o envio ('+r.status+')'));
+  const fd=new FormData();
+  fd.append('file',arquivo,nome||'arquivo');
+  fd.append('api_key',a.api_key); fd.append('timestamp',a.timestamp);
+  fd.append('signature',a.signature); fd.append('folder',a.folder); fd.append('type',a.type);
+  const up=await fetch('https://api.cloudinary.com/v1_1/'+a.conta+'/'+tipoRecurso+'/upload',{method:'POST',body:fd});
+  if(!up.ok){ let t=''; try{ t=await up.text(); }catch(e){} throw new Error('o servidor de arquivos recusou ('+up.status+') '+t.slice(0,120)); }
+  const j=await up.json();
+  // O endereco devolvido traz uma assinatura que abriria o arquivo para
+  // sempre, sem login. Guardado sem ela; quem abre e o Worker.
+  ['secure_url','url'].forEach(function(k){ if(j&&typeof j[k]==='string') j[k]=j[k].replace(/\/s--[^\/]+--\//,'/'); });
+  return j;
+}
+// Depois de gravar SEM o arquivo, pede para apagar no Cloudinary. O Worker so
+// apaga se nenhum registro citar mais o arquivo. Falha aqui nao atrapalha.
+async function excluirArquivoDoAnexo(url){
+  if(!url) return;
+  try{ await fetch(WORKER,{method:'POST',cache:'no-store',
+    headers:cabecalhos({'Content-Type':'application/json','X-Action':'excluir-anexo'}),
+    body:JSON.stringify({url:url})}); }catch(e){}
+}
+// Reduz a foto no celular antes de subir: ~1600 px no lado maior, JPEG 70%.
+// Uma foto de celular de 4 MB vira uns 300 KB — sobe rapido na obra.
+function reduzirFoto(arquivo){
+  return new Promise(function(ok,falhou){
+    const u=URL.createObjectURL(arquivo);
+    const im=new Image();
+    im.onload=function(){
+      const maior=Math.max(im.naturalWidth,im.naturalHeight)||1;
+      const f=Math.min(1,1600/maior);
+      const c=document.createElement('canvas');
+      c.width=Math.round(im.naturalWidth*f); c.height=Math.round(im.naturalHeight*f);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);
+      c.toBlob(function(b){ b?ok(b):falhou(new Error('não consegui reduzir a foto')); },'image/jpeg',0.7);
+    };
+    im.onerror=function(){ URL.revokeObjectURL(u); falhou(new Error('o arquivo não é uma foto que o navegador consiga abrir')); };
+    im.src=u;
+  });
+}
+// Onde a pessoa esta na hora da foto. Sem permissao ou sem sinal, segue sem
+// local (nunca impede a foto).
+function pegarLocal(){
+  return new Promise(function(ok){
+    if(!navigator.geolocation) return ok(null);
+    let feito=false;
+    const fim=function(v){ if(!feito){ feito=true; ok(v); } };
+    setTimeout(function(){ fim(null); },10000);
+    navigator.geolocation.getCurrentPosition(function(p){
+      fim({lat:Math.round(p.coords.latitude*1e6)/1e6, lng:Math.round(p.coords.longitude*1e6)/1e6, prec:Math.round(p.coords.accuracy||0)});
+    },function(){ fim(null); },{enableHighAccuracy:true,timeout:9000,maximumAge:60000});
+  });
+}
+function linkMapa(l){ return 'https://www.google.com/maps?q='+encodeURIComponent(l.lat+','+l.lng); }
+// Miniaturas: baixadas uma vez por tela e guardadas na memoria.
+const _miniaturas={};
+function miniatura(url,nome){
+  if(_miniaturas[url]) return _miniaturas[url];
+  _miniaturas[url]=(async function(){
+    const u=await linkDoAnexo(url,nome,'miniatura');
+    const r=await fetch(u,{cache:'no-store'});
+    if(!r.ok) throw new Error('foto '+r.status);
+    return URL.createObjectURL(await r.blob());
+  })();
+  _miniaturas[url].catch(function(){ delete _miniaturas[url]; });
+  return _miniaturas[url];
+}
+async function preencherMiniaturas(raiz){
+  (raiz||document).querySelectorAll('img[data-mini]').forEach(async function(im){
+    if(im.getAttribute('src')) return;
+    try{ im.src=await miniatura(im.getAttribute('data-mini'),im.getAttribute('data-nome')); }
+    catch(e){ im.alt='não abriu'; im.style.background='#fdecea'; }
+  });
+}
+// Foto grande: abre numa janela do sistema (fica anotado na Auditoria).
+async function verFoto(url,nome,legenda){
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;z-index:2147482000;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;gap:10px';
+  ov.innerHTML='<div style="color:#fff;font-size:13px;text-align:center" id="vf-leg"></div><div id="vf-corpo" style="color:#fff">Abrindo...</div>'+
+    '<button class="btn btn-outline" id="vf-fechar">Fechar</button>';
+  document.body.appendChild(ov);
+  ov.querySelector('#vf-leg').innerHTML=legenda||'';
+  ov.querySelector('#vf-fechar').onclick=function(){ ov.remove(); };
+  ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+  try{
+    const u=await linkDoAnexo(url,nome,'ver');
+    const im=document.createElement('img');
+    im.src=u; im.alt=nome||''; im.style.cssText='max-width:100%;max-height:78vh;object-fit:contain;border-radius:6px';
+    const c=ov.querySelector('#vf-corpo'); c.textContent=''; c.appendChild(im);
+  }catch(e){ ov.querySelector('#vf-corpo').textContent='Não consegui abrir a foto: '+e.message; }
+}
+function legendaDaFoto(f){
+  return esc(fmtQuando(f.quando))+(f.quem?' · '+esc(f.quem):'')+
+    (f.local?' · <a href="'+esc(linkMapa(f.local))+'" target="_blank" rel="noopener" style="color:inherit">📍 ver no mapa</a>':
+      (f.daGaleria?' · <span title="Foto escolhida da galeria: o local de quando foi tirada não vem junto">sem local (galeria)</span>':' · sem local'));
+}
+function meuLogin(){ try{ const t=lerToken(); return String((t&&t.dados&&t.dados.u)||'').toLowerCase(); }catch(e){ return ''; } }
+function podeTirar(item){ return papel==='admin'||papel==='gerente'||(item&&String(item.login||'').toLowerCase()===meuLogin()); }
+
+// Grava foto/audio direto no banco (nao passa pelo rascunho das medidas):
+// le o banco, acrescenta na lista daquela esquadria e grava. Duas pessoas
+// pondo foto juntas nao apagam uma a outra (gravacao condicional).
+async function acrescentarNaEsquadria(esqId, lista, item, rotulo){
+  const o=obraPorId(obraAberta)||{};
+  return alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    const e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(!e) return false;
+    if(!Array.isArray(e[lista])) e[lista]=[];
+    e[lista].push(item);
+    if(!Array.isArray(e.historico)) e.historico=[];
+    e.historico.push({quando:agoraISO(),quem:usuario,campo:lista,de:'',para:'+ '+item.nome});
+  },{acao:'acrescentou '+rotulo, alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:item.nome});
+}
+async function tirarDaEsquadria(esqId, lista, itemId, rotulo){
+  const a0=acompDaObra(obraAberta);
+  const e0=a0&&a0.esquadrias.find(function(x){ return x.id===esqId; });
+  const it=e0&&(e0[lista]||[]).find(function(x){ return x.id===itemId; });
+  if(!it) return;
+  if(!podeTirar(it)){ aviso('Não dá para tirar','Só quem pôs o arquivo, o gerente ou o administrador pode tirar.'); return; }
+  if(!confirm('Tirar '+rotulo+' "'+it.nome+'"?')) return;
+  const o=obraPorId(obraAberta)||{};
+  const deu=await alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    const e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(!e||!Array.isArray(e[lista])) return false;
+    const antes=e[lista].length;
+    e[lista]=e[lista].filter(function(x){ return x.id!==itemId; });
+    if(e[lista].length===antes) return false;
+    if(!Array.isArray(e.historico)) e.historico=[];
+    e.historico.push({quando:agoraISO(),quem:usuario,campo:lista,de:it.nome,para:'(tirado)'});
+  },{acao:'tirou '+rotulo, alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:it.nome});
+  if(deu){ excluirArquivoDoAnexo(it.url); redesenharFicha(esqId); }
+}
+
+async function recebeuFotos(input){
+  const esqId=input.getAttribute('data-e'), daGaleria=input.getAttribute('data-galeria')==='1';
+  const arquivos=Array.prototype.slice.call(input.files||[]);
+  input.value='';
+  if(!arquivos.length || recusarSeConsulta()) return;
+  const e=esquadriaNaTela(esqId); if(!e) return;
+  // Local so na foto da camera: a da galeria pode ter sido tirada em outro lugar.
+  const local=daGaleria?null:await pegarLocal();
+  let feitas=0;
+  for(let i=0;i<arquivos.length;i++){
+    const f=arquivos[i];
+    status('📷 Enviando foto '+(i+1)+' de '+arquivos.length+'...');
+    try{
+      const reduzida=await reduzirFoto(f);
+      const tipo=e.tipo||e.tipoPdf||'vao';
+      const nome=tipo+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'_'+(i+1)+'.jpg';
+      const j=await enviarArquivoPrivado(reduzida,'image',nome);
+      const quando=daGaleria&&f.lastModified?new Date(f.lastModified).toISOString():agoraISO();
+      const item={id:novoId(),url:j.secure_url,nome:nome,tamanho:reduzida.size,quando:quando,enviadoEm:agoraISO(),
+                  quem:usuario,login:meuLogin(),local:local,daGaleria:daGaleria||undefined};
+      const ok=await acrescentarNaEsquadria(esqId,'fotos',item,'foto do vão');
+      if(ok) feitas++; else excluirArquivoDoAnexo(item.url);
+    }catch(err){
+      aviso('Foto não enviada','"'+(f.name||'foto')+'": '+err.message+'\n\nConfira a internet e tente de novo.');
+    }
+  }
+  redesenharFicha(esqId);
+  if(feitas) status('🟢 '+feitas+' foto'+(feitas>1?'s':'')+' salva'+(feitas>1?'s':'')+' · '+agoraHora());
+}
+
+// ---- Audio: gravado no proprio celular (MediaRecorder). Sobe como "video"
+// no Cloudinary, que e onde ele guarda audio.
+let _gravador=null;
+function tipoDeAudio(){
+  const ops=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg'];
+  if(!window.MediaRecorder||!MediaRecorder.isTypeSupported) return '';
+  return ops.find(function(t){ return MediaRecorder.isTypeSupported(t); })||'';
+}
+async function gravarAudio(esqId){
+  if(recusarSeConsulta()) return;
+  if(_gravador){ pararAudio(); return; }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){
+    // Navegador sem gravador: escolhe um arquivo de audio do celular.
+    const inp=document.getElementById('audio-arq-'+esqId); if(inp) inp.click();
+    return;
+  }
+  let fluxo;
+  try{ fluxo=await navigator.mediaDevices.getUserMedia({audio:true}); }
+  catch(e){ aviso('Microfone bloqueado','O navegador não liberou o microfone. Permita o uso do microfone para este site e tente de novo.'); return; }
+  const tipo=tipoDeAudio();
+  const rec=new MediaRecorder(fluxo,tipo?{mimeType:tipo}:undefined);
+  const partes=[];
+  rec.ondataavailable=function(ev){ if(ev.data&&ev.data.size) partes.push(ev.data); };
+  _gravador={rec:rec,fluxo:fluxo,esqId:esqId,inicio:Date.now(),relogio:null};
+  rec.onstop=async function(){
+    const g=_gravador; _gravador=null;
+    clearInterval(g.relogio);
+    fluxo.getTracks().forEach(function(t){ t.stop(); });
+    const blob=new Blob(partes,{type:rec.mimeType||tipo||'audio/webm'});
+    const seg=Math.round((Date.now()-g.inicio)/1000);
+    redesenharFicha(esqId);
+    if(seg<1||!blob.size) return;
+    await enviarAudio(esqId,blob,seg);
+  };
+  rec.start(1000);
+  _gravador.relogio=setInterval(function(){
+    const b=document.getElementById('btn-audio-'+esqId);
+    if(b&&_gravador) b.textContent='⏹ Parar ('+fmtSeg(Math.round((Date.now()-_gravador.inicio)/1000))+')';
+  },500);
+  const b=document.getElementById('btn-audio-'+esqId);
+  if(b){ b.textContent='⏹ Parar (0:00)'; b.classList.add('gravando'); }
+}
+function pararAudio(){ if(_gravador&&_gravador.rec.state!=='inactive') _gravador.rec.stop(); }
+function fmtSeg(s){ s=Math.max(0,s|0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function extensaoDoAudio(mime){ return /mp4|m4a|aac/.test(mime)?'m4a':/ogg/.test(mime)?'ogg':/mpeg|mp3/.test(mime)?'mp3':'webm'; }
+async function enviarAudio(esqId,blob,seg){
+  const e=esquadriaNaTela(esqId); if(!e) return;
+  status('🎙 Enviando áudio...');
+  try{
+    const tipo=e.tipo||e.tipoPdf||'vao';
+    const nome='audio_'+tipo+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.'+extensaoDoAudio(blob.type);
+    const j=await enviarArquivoPrivado(blob,'video',nome);
+    const item={id:novoId(),url:j.secure_url,nome:nome,tamanho:blob.size,duracao:seg||Math.round(j.duration||0),
+                quando:agoraISO(),quem:usuario,login:meuLogin()};
+    const ok=await acrescentarNaEsquadria(esqId,'audios',item,'áudio técnico');
+    if(!ok) excluirArquivoDoAnexo(item.url);
+    else status('🟢 Áudio salvo · '+agoraHora());
+  }catch(err){ aviso('Áudio não enviado',err.message+'\n\nConfira a internet e tente de novo.'); }
+  redesenharFicha(esqId);
+}
+async function recebeuArquivoDeAudio(input){
+  const esqId=input.getAttribute('data-e');
+  const f=input.files&&input.files[0]; input.value='';
+  if(!f||recusarSeConsulta()) return;
+  if(f.size>25*1024*1024){ aviso('Áudio grande demais','O limite é 25 MB.'); return; }
+  await enviarAudio(esqId,f,0);
+}
+async function ouvirAudio(btn){
+  const url=btn.getAttribute('data-url'), nome=btn.getAttribute('data-nome');
+  const lugar=btn.parentNode;
+  btn.disabled=true; btn.textContent='Abrindo...';
+  try{
+    const u=await linkDoAnexo(url,nome,'ver');
+    const r=await fetch(u,{cache:'no-store'});
+    if(!r.ok) throw new Error('áudio '+r.status);
+    const au=document.createElement('audio');
+    au.controls=true; au.src=URL.createObjectURL(await r.blob()); au.style.cssText='width:100%;max-width:320px;height:36px';
+    btn.replaceWith(au);
+    au.play().catch(function(){});
+  }catch(e){ btn.disabled=false; btn.textContent='▶ Ouvir'; aviso('Não consegui abrir o áudio',e.message); }
+}
+
+function htmlMidias(e){
+  const fotos=Array.isArray(e.fotos)?e.fotos:[], audios=Array.isArray(e.audios)?e.audios:[];
+  const so=ehConsulta();
+  let h='<div class="secao"><h4>Fotos do vão'+(fotos.length?' ('+fotos.length+')':'')+'</h4>';
+  if(fotos.length){
+    h+='<div class="fotos">'+fotos.map(function(f){
+      return '<div class="foto"><img data-mini="'+esc(f.url)+'" data-nome="'+esc(f.nome)+'" alt="Foto '+esc(e.tipo||e.tipoPdf)+'" '+
+        'onclick="verFoto(this.getAttribute(\'data-mini\'),this.getAttribute(\'data-nome\'),this.parentNode.querySelector(\'.foto-leg\').innerHTML)">'+
+        '<div class="foto-leg">'+legendaDaFoto(f)+'</div>'+
+        (!so&&podeTirar(f)?'<button class="foto-x" title="Tirar esta foto" onclick="tirarDaEsquadria(\''+e.id+'\',\'fotos\',\''+f.id+'\',\'a foto\')">×</button>':'')+
+      '</div>';
+    }).join('')+'</div>';
+  } else h+='<div class="depois">Nenhuma foto ainda.</div>';
+  if(!so){
+    h+='<div class="midia-botoes">'+
+      '<label class="btn btn-cor btn-sm">📷 Tirar foto<input type="file" accept="image/*" capture="environment" data-e="'+e.id+'" onchange="recebeuFotos(this)" hidden></label>'+
+      '<label class="btn btn-outline btn-sm">🖼 Da galeria<input type="file" accept="image/*" multiple data-e="'+e.id+'" data-galeria="1" onchange="recebeuFotos(this)" hidden></label>'+
+      '</div>';
+  }
+  h+='</div><div class="secao"><h4>Áudios técnicos'+(audios.length?' ('+audios.length+')':'')+'</h4>';
+  if(audios.length){
+    h+=audios.map(function(au){
+      return '<div class="audio-linha"><button class="btn btn-outline btn-sm" data-url="'+esc(au.url)+'" data-nome="'+esc(au.nome)+'" onclick="ouvirAudio(this)">▶ Ouvir</button>'+
+        '<span class="audio-info">'+(au.duracao?fmtSeg(au.duracao)+' · ':'')+esc(fmtQuando(au.quando))+(au.quem?' · '+esc(au.quem):'')+'</span>'+
+        (!so&&podeTirar(au)?'<button class="btn btn-outline btn-sm" title="Tirar este áudio" onclick="tirarDaEsquadria(\''+e.id+'\',\'audios\',\''+au.id+'\',\'o áudio\')">×</button>':'')+
+      '</div>';
+    }).join('');
+  } else h+='<div class="depois">Nenhum áudio ainda.</div>';
+  if(!so){
+    const gravandoAqui=_gravador&&_gravador.esqId===e.id;
+    h+='<div class="midia-botoes"><button class="btn '+(gravandoAqui?'btn-cor gravando':'btn-outline')+' btn-sm" id="btn-audio-'+e.id+'" onclick="gravarAudio(\''+e.id+'\')">'+
+      (gravandoAqui?'⏹ Parar ('+fmtSeg(Math.round((Date.now()-_gravador.inicio)/1000))+')':'🎙 Gravar áudio')+'</button>'+
+      '<input type="file" accept="audio/*" id="audio-arq-'+e.id+'" data-e="'+e.id+'" onchange="recebeuArquivoDeAudio(this)" hidden></div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+// ================= VISITAS (ETAPA 2) =================
+// Cada visita a obra: data, hora, tipo, situacao de cada vao naquele dia,
+// pendencias de terceiros (quem precisa fazer o que antes da nossa
+// instalacao) e fotos. A situacao e um RETRATO do dia — nao muda a ficha.
+const TIPOS_VISITA=['Medição','Acompanhamento','Vistoria','Entrega técnica','Outro'];
+const SITUACOES=[{id:'liberado',nome:'Liberado'},{id:'nao',nome:'Não liberado'},{id:'naovisto',nome:'Não verificado'}];
+let _visita=null, _visitaNovas=[];
+function hojeISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function horaAgora(){ const d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+function htmlVisitas(a){
+  const vs=(Array.isArray(a.visitas)?a.visitas:[]).slice().sort(function(x,y){ return String(y.data+y.hora).localeCompare(String(x.data+x.hora)); });
+  let h='<div class="cab"><div class="cab-topo"><div class="cab-titulo" style="font-size:15px">Visitas'+(vs.length?' ('+vs.length+')':'')+'</div>'+
+    (ehConsulta()?'':'<button class="btn btn-cor btn-sm" onclick="abrirVisita(null)">+ Registrar visita</button>')+'</div>';
+  if(!vs.length) h+='<div class="depois">Nenhuma visita registrada ainda.</div>';
+  vs.forEach(function(v){
+    const vaos=v.vaos||[], lib=vaos.filter(function(x){ return x.situacao==='liberado'; }).length;
+    const pend=(v.pendencias||[]).filter(function(p){ return p.texto; });
+    h+='<div class="visita-linha" onclick="abrirVisita(\''+v.id+'\')">'+
+      '<div><b>'+esc(fmtData(v.data))+(v.hora?' '+esc(v.hora):'')+'</b> · '+esc(v.tipo||'Visita')+' · '+esc(v.quem||'')+'</div>'+
+      '<div class="obra-sub">'+(vaos.length?lib+' de '+vaos.length+' vão(s) liberado(s)':'')+
+        (pend.length?' · <span style="color:var(--amber)">'+pend.length+' pendência(s) de terceiros</span>':'')+
+        ((v.fotos||[]).length?' · '+v.fotos.length+' foto(s)':'')+'</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function abrirVisita(id){
+  const a=acompDaObra(obraAberta); if(!a) return;
+  const ja=id?(a.visitas||[]).find(function(v){ return v.id===id; }):null;
+  if(id&&!ja) return;
+  _visitaNovas=[];
+  if(ja) _visita=copia(ja);
+  else _visita={id:null,data:hojeISO(),hora:horaAgora(),tipo:'Medição',obs:'',fotos:[],pendencias:[{texto:'',de:''}],
+    vaos:a.esquadrias.map(function(e){
+      const c=valor(e,'condicao');
+      return {esqId:e.id,tipo:valor(e,'tipo')||e.tipoPdf,local:valor(e,'local'),situacao:c==='liberado'?'liberado':c==='nao'?'nao':'naovisto',obs:''};
+    })};
+  // Esquadria nova depois da visita: aparece para completar, como "nao verificado".
+  a.esquadrias.forEach(function(e){
+    if(!_visita.vaos.some(function(x){ return x.esqId===e.id; }))
+      _visita.vaos.push({esqId:e.id,tipo:valor(e,'tipo')||e.tipoPdf,local:valor(e,'local'),situacao:'naovisto',obs:''});
+  });
+  desenharVisita();
+  document.getElementById('visita-ov').classList.add('open');
+}
+function desenharVisita(){
+  // Alterar a visita: quem registrou, o gerente ou o administrador. Os demais
+  // abrem para ler.
+  const v=_visita, so=ehConsulta()||(!!v.id&&!podeTirar(v));
+  const dis=so?' disabled':'';
+  let h='<div class="grade grade-visita">'+
+    '<div class="fg"><label>Data</label><input type="date" value="'+esc(v.data)+'"'+dis+' oninput="_visita.data=this.value"></div>'+
+    '<div class="fg"><label>Hora</label><input type="time" value="'+esc(v.hora)+'"'+dis+' oninput="_visita.hora=this.value"></div>'+
+    '<div class="fg"><label>Tipo</label><select'+dis+' onchange="_visita.tipo=this.value">'+TIPOS_VISITA.map(function(t){ return '<option'+(t===v.tipo?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'</select></div></div>';
+  h+='<div class="secao"><h4>Situação dos vãos neste dia</h4>'+v.vaos.map(function(x,i){
+    return '<div class="vv-linha"><div class="vv-tipo"><b>'+esc(x.tipo)+'</b>'+(x.local?'<br><span>'+esc(x.local)+'</span>':'')+'</div>'+
+      '<div class="fg"><select'+dis+' onchange="_visita.vaos['+i+'].situacao=this.value">'+SITUACOES.map(function(s){ return '<option value="'+s.id+'"'+(s.id===x.situacao?' selected':'')+'>'+esc(s.nome)+'</option>'; }).join('')+'</select></div>'+
+      '<div class="fg"><input placeholder="Obs. (ex.: falta reboco)" value="'+esc(x.obs)+'"'+dis+' oninput="_visita.vaos['+i+'].obs=this.value"></div></div>';
+  }).join('')+'</div>';
+  h+='<div class="secao"><h4>Pendências de terceiros</h4><div class="depois" style="margin-bottom:6px">O que outra equipe precisa fazer antes da nossa instalação (ex.: pedreiro, eletricista, gesseiro).</div>'+
+    v.pendencias.map(function(p,i){
+      return '<div class="grade2" style="grid-template-columns:2fr 1fr auto;margin-bottom:6px">'+
+        '<div class="fg"><input placeholder="O que falta" value="'+esc(p.texto)+'"'+dis+' oninput="_visita.pendencias['+i+'].texto=this.value"></div>'+
+        '<div class="fg"><input placeholder="De quem (ex.: pedreiro)" value="'+esc(p.de)+'"'+dis+' oninput="_visita.pendencias['+i+'].de=this.value"></div>'+
+        (so?'':'<button class="btn btn-outline btn-sm" title="Tirar" onclick="_visita.pendencias.splice('+i+',1);desenharVisita()">×</button>')+'</div>';
+    }).join('')+(so?'':'<button class="btn btn-outline btn-sm" onclick="_visita.pendencias.push({texto:\'\',de:\'\'});desenharVisita()">+ pendência</button>')+'</div>';
+  h+='<div class="secao"><h4>Observações da visita</h4><div class="fg"><textarea'+dis+' oninput="_visita.obs=this.value">'+esc(v.obs)+'</textarea></div></div>';
+  h+='<div class="secao"><h4>Fotos da visita'+(v.fotos.length?' ('+v.fotos.length+')':'')+'</h4>';
+  if(v.fotos.length) h+='<div class="fotos">'+v.fotos.map(function(f){
+    return '<div class="foto"><img data-mini="'+esc(f.url)+'" data-nome="'+esc(f.nome)+'" alt="Foto da visita" '+
+      'onclick="verFoto(this.getAttribute(\'data-mini\'),this.getAttribute(\'data-nome\'),this.parentNode.querySelector(\'.foto-leg\').innerHTML)">'+
+      '<div class="foto-leg">'+legendaDaFoto(f)+'</div>'+
+      (so?(f.noRelatorio?'<div class="foto-rel on">★ no relatório</div>':''):
+        '<button class="foto-rel'+(f.noRelatorio?' on':'')+'" onclick="marcarNoRelatorio(\''+f.id+'\')">'+(f.noRelatorio?'★ no relatório':'☆ pôr no relatório')+'</button>')+
+      (so?'':'<button class="foto-x" title="Tirar esta foto" onclick="tirarFotoDaVisita(\''+f.id+'\')">×</button>')+'</div>';
+  }).join('')+'</div>'+
+  '<div class="depois" style="margin-top:4px">O relatório leva até 6 fotos: as marcadas com ★, ou as 6 primeiras se nenhuma for marcada.</div>';
+  if(!so) h+='<div class="midia-botoes">'+
+    '<label class="btn btn-cor btn-sm">📷 Tirar foto<input type="file" accept="image/*" capture="environment" onchange="recebeuFotosDaVisita(this,false)" hidden></label>'+
+    '<label class="btn btn-outline btn-sm">🖼 Da galeria<input type="file" accept="image/*" multiple onchange="recebeuFotosDaVisita(this,true)" hidden></label></div>';
+  h+='</div>';
+  if(v.id) h+='<div class="depois" style="margin-top:10px">Registrada por '+esc(v.quem||'—')+' em '+esc(fmtQuando(v.criadoEm))+(v.editadoPor?' · alterada por '+esc(v.editadoPor)+' em '+esc(fmtQuando(v.editadoEm)):'')+'</div>';
+  document.getElementById('visita-titulo').textContent=v.id?'Visita de '+fmtData(v.data):'Registrar visita';
+  document.getElementById('visita-corpo').innerHTML=h;
+  document.getElementById('visita-pe').innerHTML=
+    (v.id?'<div class="pdf-botoes"><button class="btn btn-outline btn-sm" onclick="relatorioDaVisita(false)">📄 Relatório PDF</button>'+
+      '<button class="btn btn-sm" style="background:#25D366;color:#fff;border-color:#1DA851" onclick="relatorioDaVisita(true)">📲 Enviar ao cliente</button></div>':'')+
+    (v.id&&!so?'<button class="btn btn-outline" style="margin-right:auto;color:var(--red)" onclick="excluirVisita()">Excluir visita</button>':'')+
+    '<button class="btn btn-outline" onclick="fecharVisita()">'+(so?'Fechar':'Cancelar')+'</button>'+
+    (so?'':'<button class="btn btn-cor" id="btn-salvar-visita" onclick="salvarVisita()">💾 Salvar visita</button>');
+  preencherMiniaturas(document.getElementById('visita-corpo'));
+}
+async function recebeuFotosDaVisita(input,daGaleria){
+  const arquivos=Array.prototype.slice.call(input.files||[]);
+  input.value='';
+  if(!arquivos.length||recusarSeConsulta()) return;
+  const local=daGaleria?null:await pegarLocal();
+  for(let i=0;i<arquivos.length;i++){
+    const f=arquivos[i];
+    status('📷 Enviando foto '+(i+1)+' de '+arquivos.length+'...');
+    try{
+      const reduzida=await reduzirFoto(f);
+      const nome='visita_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'_'+(i+1)+'.jpg';
+      const j=await enviarArquivoPrivado(reduzida,'image',nome);
+      const item={id:novoId(),url:j.secure_url,nome:nome,tamanho:reduzida.size,
+        quando:daGaleria&&f.lastModified?new Date(f.lastModified).toISOString():agoraISO(),enviadoEm:agoraISO(),
+        quem:usuario,login:meuLogin(),local:local,daGaleria:daGaleria||undefined};
+      if(!_visita){ excluirArquivoDoAnexo(item.url); return; }
+      _visita.fotos.push(item); _visitaNovas.push(item.url);
+    }catch(err){ aviso('Foto não enviada','"'+(f.name||'foto')+'": '+err.message); }
+  }
+  status('🟡 Foto(s) na visita — falta salvar');
+  if(_visita) desenharVisita();
+}
+function marcarNoRelatorio(fid){
+  if(!_visita) return;
+  const f=_visita.fotos.find(function(x){ return x.id===fid; }); if(!f) return;
+  if(!f.noRelatorio && _visita.fotos.filter(function(x){ return x.noRelatorio; }).length>=6){
+    aviso('Já são 6','O relatório leva no máximo 6 fotos. Desmarque uma antes de marcar outra.'); return;
+  }
+  f.noRelatorio=!f.noRelatorio||undefined;
+  desenharVisita();
+}
+// O relatorio sai do que esta SALVO: com alteracao na tela, salva antes.
+function visitaMudou(){
+  if(!_visita||!_visita.id) return true;
+  const a=acompDaObra(obraAberta);
+  const salva=a&&(a.visitas||[]).find(function(x){ return x.id===_visita.id; });
+  return !salva || JSON.stringify(salva)!==JSON.stringify(_visita) || _visitaNovas.length>0;
+}
+async function relatorioDaVisita(enviar){
+  if(!_visita||!_visita.id) return;
+  if(visitaMudou()){
+    if(!ehConsulta() && (podeTirar(_visita))){
+      if(!confirm('Há alterações nesta visita. Salvar antes de gerar o relatório?')) return;
+      const id=_visita.id;
+      await salvarVisita();
+      if(_visita) return;           // nao salvou: o aviso ja apareceu
+      if(enviar) await enviarRelatorioWhats(id); else await gerarRelatorioPdf(id);
+      return;
+    }
+  }
+  const id=_visita.id;
+  if(enviar) await enviarRelatorioWhats(id); else await gerarRelatorioPdf(id);
+}
+function tirarFotoDaVisita(fid){
+  if(!_visita) return;
+  const f=_visita.fotos.find(function(x){ return x.id===fid; }); if(!f) return;
+  if(!podeTirar(f)){ aviso('Não dá para tirar','Só quem pôs a foto, o gerente ou o administrador pode tirar.'); return; }
+  _visita.fotos=_visita.fotos.filter(function(x){ return x.id!==fid; });
+  desenharVisita();
+}
+function fecharVisita(){
+  if(_visitaNovas.length && !confirm('As fotos que você pôs nesta visita serão descartadas. Fechar sem salvar?')) return;
+  // Fotos enviadas e nao salvas: apagadas (ninguem cita, o Worker apaga).
+  _visitaNovas.forEach(function(u){ excluirArquivoDoAnexo(u); });
+  _visitaNovas=[]; _visita=null;
+  document.getElementById('visita-ov').classList.remove('open');
+}
+async function salvarVisita(){
+  const v=_visita; if(!v) return;
+  if(!v.data){ aviso('Falta a data','Preencha a data da visita.'); return; }
+  const btn=document.getElementById('btn-salvar-visita'); if(btn) btn.disabled=true;
+  v.pendencias=v.pendencias.filter(function(p){ return String(p.texto||'').trim()||String(p.de||'').trim(); });
+  const nova=!v.id;
+  const antes=nova?null:((acompDaObra(obraAberta)||{}).visitas||[]).find(function(x){ return x.id===v.id; });
+  const o=obraPorId(obraAberta)||{};
+  const deu=await alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    if(!a) return false;
+    if(!Array.isArray(a.visitas)) a.visitas=[];
+    const reg=copia(v);
+    if(nova){ reg.id=novoId(); reg.quem=usuario; reg.login=meuLogin(); reg.criadoEm=agoraISO(); a.visitas.push(reg); }
+    else {
+      const i=a.visitas.findIndex(function(x){ return x.id===v.id; });
+      if(i<0) return false;
+      reg.editadoPor=usuario; reg.editadoEm=agoraISO();
+      a.visitas[i]=reg;
+    }
+  },{acao:nova?'registrou visita':'alterou visita', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:fmtData(v.data)+' · '+v.tipo});
+  if(btn) btn.disabled=false;
+  if(!deu) return;
+  // Foto tirada da visita ao editar (ou posta e tirada antes de salvar): o
+  // arquivo pode ser apagado agora.
+  const ficaram=function(u){ return v.fotos.some(function(x){ return x.url===u; }); };
+  if(antes) (antes.fotos||[]).forEach(function(f){ if(!ficaram(f.url)) excluirArquivoDoAnexo(f.url); });
+  _visitaNovas.forEach(function(u){ if(!ficaram(u)) excluirArquivoDoAnexo(u); });
+  _visitaNovas=[]; _visita=null;
+  document.getElementById('visita-ov').classList.remove('open');
+  render();
+}
+async function excluirVisita(){
+  const v=_visita; if(!v||!v.id) return;
+  if(!confirm('Excluir a visita de '+fmtData(v.data)+'? As fotos dela também saem.')) return;
+  const antes=((acompDaObra(obraAberta)||{}).visitas||[]).find(function(x){ return x.id===v.id; })||v;
+  const o=obraPorId(obraAberta)||{};
+  const deu=await alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    if(!a||!Array.isArray(a.visitas)) return false;
+    const n=a.visitas.length;
+    a.visitas=a.visitas.filter(function(x){ return x.id!==v.id; });
+    if(a.visitas.length===n) return false;
+  },{acao:'excluiu visita', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:fmtData(v.data)+' · '+v.tipo});
+  if(!deu) return;
+  (antes.fotos||[]).concat(v.fotos||[]).forEach(function(f){ excluirArquivoDoAnexo(f.url); });
+  _visitaNovas=[]; _visita=null;
+  document.getElementById('visita-ov').classList.remove('open');
+  render();
+}
+
+// ================= PDFs (ETAPA 3) =================
+// Gerados no proprio aparelho com o jsPDF (o mesmo da Obra, com selo de
+// conferencia). Nada passa pelo Worker. Modelos aprovados pelo Ander:
+// Ficha_Medicao_Vaos_Caroline_Santos.pdf e Relatorio_Visita_Cezar_Farinon.
+const JSPDF_URL='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+const JSPDF_SELO='sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk';
+let _jspdf=null;
+function carregarJsPDF(){
+  if(window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if(_jspdf) return _jspdf;
+  _jspdf=new Promise(function(ok,falhou){
+    const s=document.createElement('script');
+    s.src=JSPDF_URL; s.integrity=JSPDF_SELO; s.crossOrigin='anonymous';
+    s.onload=function(){ if(window.jspdf&&window.jspdf.jsPDF) ok(window.jspdf.jsPDF); else falhou(new Error('o componente de PDF não carregou direito')); };
+    s.onerror=function(){ _jspdf=null; falhou(new Error('não consegui baixar o componente de PDF (confira a internet)')); };
+    document.head.appendChild(s);
+  });
+  return _jspdf;
+}
+const COR_MARCA=[181,101,29], COR_TEXTO=[35,40,47], COR_ROTULO=[110,118,128], COR_LINHA=[200,205,210], COR_FUNDO=[238,240,242];
+// Nome de arquivo sem acento nem simbolo (o WhatsApp e o celular agradecem).
+function nomeArquivo(t){ return String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,''); }
+function txt(v){ return v==null?'':String(v); }
+// Carrega uma imagem (dataURL ou endereco local) ja RECORTADA na proporcao
+// pedida, como foto de quadro: preenche tudo, corta as sobras.
+function imagemRecortada(src,proporcao,larguraPx){
+  return new Promise(function(ok,falhou){
+    const im=new Image();
+    im.onload=function(){
+      const W=larguraPx||900, H=Math.round(W/proporcao);
+      const c=document.createElement('canvas'); c.width=W; c.height=H;
+      const g=c.getContext('2d');
+      const ri=im.naturalWidth/im.naturalHeight;
+      let sw=im.naturalWidth, sh=im.naturalHeight, sx=0, sy=0;
+      if(ri>proporcao){ sw=sh*proporcao; sx=(im.naturalWidth-sw)/2; } else { sh=sw/proporcao; sy=(im.naturalHeight-sh)/2; }
+      g.fillStyle='#fff'; g.fillRect(0,0,W,H);
+      g.drawImage(im,sx,sy,sw,sh,0,0,W,H);
+      ok(c.toDataURL('image/jpeg',0.82));
+    };
+    im.onerror=function(){ falhou(new Error('imagem não abriu')); };
+    im.src=src;
+  });
+}
+// Imagem inteira (sem cortar), com o tamanho original — para os desenhos.
+function tamanhoDaImagem(src){
+  return new Promise(function(ok){ const im=new Image(); im.onload=function(){ ok({w:im.naturalWidth,h:im.naturalHeight}); }; im.onerror=function(){ ok(null); }; im.src=src; });
+}
+function pdfCabecalho(pdf,titulo,tituloPequeno){
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(15); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  pdf.text("D'ALUMINIUM",12,15);
+  const lw=pdf.getTextWidth("D'ALUMINIUM ");
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_MARCA);
+  pdf.text('ARCH & DESIGN',12+lw,15);
+  if(tituloPequeno){ pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_ROTULO); }
+  else { pdf.setFont('helvetica','bold'); pdf.setFontSize(14); pdf.setTextColor.apply(pdf,COR_TEXTO); }
+  pdf.text(titulo,198,15,{align:'right'});
+  pdf.setDrawColor.apply(pdf,COR_MARCA); pdf.setLineWidth(0.5); pdf.line(12,18,198,18);
+}
+function pdfRotulo(pdf,t,x,y){ pdf.setFont('helvetica','bold'); pdf.setFontSize(6.5); pdf.setTextColor.apply(pdf,COR_ROTULO); pdf.text(String(t).toUpperCase(),x,y); }
+function pdfValor(pdf,t,x,y,tam,negrito,maxW){
+  pdf.setFont('helvetica',negrito?'bold':'normal'); pdf.setFontSize(tam||9); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  const linhas=maxW?pdf.splitTextToSize(txt(t),maxW):[txt(t)];
+  pdf.text(linhas,x,y); return linhas.length;
+}
+function pdfCaixa(pdf,x,y,w,h,fundo){
+  pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineWidth(0.25);
+  if(fundo){ pdf.setFillColor.apply(pdf,fundo); pdf.rect(x,y,w,h,'FD'); } else pdf.rect(x,y,w,h);
+}
+function pdfMarca(pdf,x,y,marcado,rot){
+  pdf.setDrawColor.apply(pdf,COR_TEXTO); pdf.setLineWidth(0.25); pdf.rect(x,y-2.6,2.8,2.8);
+  if(marcado){ pdf.setLineWidth(0.5); pdf.line(x+0.5,y-1.3,x+1.2,y-0.3); pdf.line(x+1.2,y-0.3,x+2.4,y-2.2); }
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text(rot,x+4,y);
+}
+async function fotoParaPdf(f,proporcao){
+  try{ const u=await miniatura(f.url,f.nome); return await imagemRecortada(u,proporcao,900); }catch(e){ return null; }
+}
+function baixarPdf(pdf,nome){ pdf.save(nome); }
+
+// ---- FICHA DE MEDICAO (uma por obra; 2 esquadrias por pagina) ----
+// Em branco = para imprimir e levar a obra (so o que veio do projeto).
+function dadosDaMedicao(a){
+  // Ultima medida gravada: data/hora e quem mediu, pelo historico das fichas.
+  const campos=['lCima','lMeio','lBaixo','hEsq','hCentro','hDir','d1','d2'];
+  let ult=null;
+  a.esquadrias.forEach(function(e){ (e.historico||[]).forEach(function(h){
+    if(campos.indexOf(h.campo)>=0 && (!ult||h.quando>ult.quando)) ult=h;
+  }); });
+  return ult;
+}
+async function gerarFichaPdf(emBranco){
+  const o=obraPorId(obraAberta), a=acompDaObra(obraAberta);
+  if(!o||!a) return;
+  if(!emBranco && temRascunho()){ aviso('Salve antes','Há medidas não salvas. Salve antes de gerar a ficha preenchida.'); return; }
+  status('📄 Montando a ficha...');
+  let jsPDF; try{ jsPDF=await carregarJsPDF(); }catch(e){ status(''); aviso('Não consegui gerar o PDF',e.message); return; }
+  const pdf=new jsPDF({unit:'mm',format:'a4',compress:true});
+  const med=emBranco?null:dadosDaMedicao(a);
+  const doc=(docsDeMedicao(o).find(function(d){ return a.origem&&d.id===a.origem.doc; }))||(a.origem?{id:a.origem.doc,url:a.origem.url,nome:a.origem.nome}:null);
+  const lista=a.esquadrias.filter(function(e){ return !e.foraDaRevisao; });
+  const paginas=Math.max(1,Math.ceil(lista.length/2));
+  const cabecalho=function(){
+    pdfCabecalho(pdf,'FICHA DE MEDIÇÃO DE VÃOS');
+    const col=[12,58.5,105,151.5], w=46.5;
+    const lin1=[['Cliente',o.cliente],['Proposta',o.proposta],['Contrato (CT)',o.ct],['Telefone',o.contato]];
+    const lin2=[['Cidade',o.cidadeUF],['Data e hora da medição',med?fmtQuando(med.quando):''],['Medidor',med?med.quem:''],['Coordenador',o.coord]];
+    [lin1,lin2].forEach(function(lin,li){
+      const y=21+li*10;
+      lin.forEach(function(c,i){ pdfCaixa(pdf,col[i],y,w,9.5); pdfRotulo(pdf,c[0],col[i]+1.5,y+3); pdfValor(pdf,pdf.splitTextToSize(txt(c[1]),w-3)[0]||'',col[i]+1.5,y+7.5,8.5); });
+    });
+  };
+  const rodape=function(n){
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor.apply(pdf,COR_ROTULO);
+    pdf.text('Medidas em milímetros. A produção usa a MENOR das três medidas de cada sentido; o técnico aplica a folga.',12,290);
+    pdf.text('Página '+n+' de '+paginas,198,290,{align:'right'});
+  };
+  for(let i=0;i<lista.length||i===0;i++){
+    const e=lista[i];
+    if(i%2===0){ if(i>0) pdf.addPage(); cabecalho(); rodape(Math.floor(i/2)+1); }
+    if(!e) break;
+    const yb=i%2===0?45:165;
+    const p=e.projeto||{};
+    // faixa do topo
+    pdf.setFillColor.apply(pdf,COR_FUNDO); pdf.rect(12,yb,186,9,'F');
+    pdfRotulo(pdf,'Tipo',14,yb+3.2); pdfValor(pdf,emBranco?(p.tipo||e.tipoPdf):(e.tipo||e.tipoPdf),14,yb+7.6,10,true);
+    pdfRotulo(pdf,'Localização',34,yb+3.2); pdfValor(pdf,emBranco?p.local:e.local,34,yb+7.6,9,true);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor.apply(pdf,COR_ROTULO);
+    pdf.text('Medida de projeto: '+(p.dimL&&p.dimH?p.dimL+' × '+p.dimH:txt(p.dimTxt))+' mm'+(p.qtde?'  ·  Qtde '+p.qtde:''),196,yb+6,{align:'right'});
+    // coluna da esquerda: desenho e projeto
+    let ye=yb+12;
+    // Croqui escolhido manda sobre o desenho do PDF.
+    if(e.croqui || (e.desenho&&doc)){
+      try{
+        const src=e.croqui?await imagemDoCroqui(e.croqui.id):await desenhoDe(doc,e.desenho);
+        const t=await tamanhoDaImagem(src);
+        // Em JPEG com fundo branco: o PNG entrava no PDF com uns 400 KB cada
+        // desenho e a ficha passava de 1 MB com 3 esquadrias (pesado para o
+        // WhatsApp).
+        if(t){ const wMax=55,hMax=36; const f=Math.min(wMax/t.w,hMax/t.h);
+          const jpg=await imagemRecortada(src,t.w/t.h,Math.min(600,t.w));
+          pdf.addImage(jpg,'JPEG',12+(wMax-t.w*f)/2,ye,t.w*f,t.h*f); }
+      }catch(err){}
+    }
+    ye+=40;
+    const bloco=function(rot,val){ if(!val) return; pdfRotulo(pdf,rot,12,ye); ye+=3.6; const n=pdfValor(pdf,val,12,ye,8,false,58); ye+=n*3.4+1.5; };
+    bloco('Descrição',p.descricao); bloco('Cor',p.cor); bloco('Vidro',p.vidro);
+    (e.notas||[]).forEach(function(n){
+      const t=n.conjunto?('Conjunto '+n.conjunto.join(' + ')+' · '+n.texto):('Anotado na proposta: '+n.texto);
+      pdf.setFont('helvetica',n.conjunto?'bold':'normal'); pdf.setFontSize(7.5);
+      const linhas=pdf.splitTextToSize(t,55);
+      if(n.conjunto){ pdf.setFillColor(250,236,200); pdf.rect(12,ye-3,58,linhas.length*3.3+2,'F'); pdf.setTextColor(122,78,7); }
+      else pdf.setTextColor.apply(pdf,COR_ROTULO);
+      pdf.text(linhas,13.5,ye); ye+=linhas.length*3.3+2.5;
+    });
+    // coluna do meio: medidas
+    const xm=77, c3=20.6;
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text('MEDIDAS DO VÃO (mm)',xm,yb+14);
+    const linhaMedidas=function(rot,y,campos,rotulos,larg){
+      pdfRotulo(pdf,rot,xm,y);
+      campos.forEach(function(c,k){
+        const x=xm+k*larg; pdfCaixa(pdf,x,y+1.5,larg,10); pdfRotulo(pdf,rotulos[k],x+1.5,y+4.5);
+        if(!emBranco&&e[c]) pdfValor(pdf,e[c],x+1.5,y+10,9.5,true);
+      });
+    };
+    linhaMedidas('Largura',yb+20,['lCima','lMeio','lBaixo'],['Em cima','No meio','Embaixo'],c3);
+    linhaMedidas('Altura',yb+35,['hEsq','hCentro','hDir'],['Esquerda','Centro','Direita'],c3);
+    linhaMedidas('',yb+49,['d1','d2'],['Diagonal 1','Diagonal 2'],c3*1.5);
+    const cts=emBranco?{L:null,H:null,pL:null,pH:null,fL:null,fH:null}:contasDe(Object.assign({},e));
+    pdf.setFillColor.apply(pdf,COR_FUNDO); pdf.rect(xm,yb+63,62,13,'F');
+    pdfRotulo(pdf,'Medida do vão (menor)',xm+2,yb+67);
+    pdfValor(pdf,'L  '+(cts.L!==null?cts.L:'________')+'    ×  H  '+(cts.H!==null?cts.H:'________'),xm+2,yb+73.5,9.5,cts.L!==null);
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(10); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text('CONDIÇÃO DO VÃO',xm,yb+82);
+    pdfMarca(pdf,xm,yb+87,!emBranco&&e.condicao==='liberado','Liberado');
+    pdfMarca(pdf,xm+22,yb+87,!emBranco&&e.condicao==='nao','Não liberado');
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor.apply(pdf,COR_ROTULO); pdf.text('Falta:',xm,yb+91.5);
+    const faltas=emBranco?[]:String(e.faltas||'').split(',');
+    [['reboco','Reboco',0,95.5],['contrapiso','Contrapiso',31,95.5],['revestimento','Revestimento',0,99.8],['prumo','Prumo/esquadro',31,99.8],['outro','Outro'+(!emBranco&&e.faltaOutro?': '+e.faltaOutro:''),0,104.1]]
+      .forEach(function(f){ pdfMarca(pdf,xm+f[2],yb+f[3],faltas.indexOf(f[0])>=0,f[1]); });
+    // coluna da direita: foto, observacoes, setor tecnico
+    const xd=144, wd=54;
+    const foto=!emBranco&&(e.fotos||[])[0];
+    if(foto){
+      const src=await fotoParaPdf(foto,wd/40);
+      if(src) pdf.addImage(src,'JPEG',xd,yb+12,wd,40);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(6.5); pdf.setTextColor.apply(pdf,COR_ROTULO);
+      pdf.text(fmtQuando(foto.quando)+(foto.local?' · local '+foto.local.lat+', '+foto.local.lng:''),xd,yb+55);
+    } else {
+      pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineDashPattern([1,1],0); pdf.rect(xd,yb+12,wd,42); pdf.setLineDashPattern([],0);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(7.5); pdf.setTextColor.apply(pdf,COR_ROTULO); pdf.text('FOTO DO VÃO',xd+wd/2,yb+31,{align:'center'});
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(6.5); pdf.text('com data, hora e endereço',xd+wd/2,yb+35,{align:'center'});
+    }
+    pdfRotulo(pdf,'Observações',xd,yb+60);
+    if(!emBranco&&e.obs){ pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text(pdf.splitTextToSize(e.obs,wd).slice(0,4),xd,yb+64); }
+    pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineWidth(0.2); pdf.line(xd,yb+79,xd+wd,yb+79);
+    pdfMarca(pdf,xd,yb+84,!emBranco&&(e.audios||[]).length>0,'Tem áudio técnico'+(!emBranco&&(e.audios||[]).length>1?' ('+e.audios.length+')':''));
+    pdf.setFillColor.apply(pdf,COR_FUNDO); pdf.rect(xd,yb+88,wd,21,'F');
+    pdf.setFont('helvetica','bold'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_MARCA); pdf.text('SETOR TÉCNICO',xd+2,yb+93);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor.apply(pdf,COR_TEXTO);
+    pdf.text('Folga  L  '+(!emBranco&&e.folgaL?e.folgaL:'_____')+'     H  '+(!emBranco&&e.folgaH?e.folgaH:'_____'),xd+2,yb+98);
+    pdf.text('Produção  L  '+(cts.pL!==null?cts.pL:'_____')+'  ×  H  '+(cts.pH!==null?cts.pH:'_____'),xd+2,yb+102.5);
+    pdf.text('Visto  '+(!emBranco&&e.visto?e.visto.quem+' · '+fmtData(diaLocal(e.visto.quando)):'______________________'),xd+2,yb+107);
+    if(i%2===0) { pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineWidth(0.2); pdf.line(12,yb+114,198,yb+114); }
+  }
+  // assinaturas no fim da ultima pagina (abaixo da unica ficha, ou no pe
+  // da pagina quando ela tem duas)
+  const ultimaY=(lista.length%2===1)?175:281;
+  {
+    pdf.setDrawColor.apply(pdf,COR_TEXTO); pdf.setLineWidth(0.25);
+    pdf.line(12,ultimaY,94,ultimaY); pdf.line(116,ultimaY,198,ultimaY);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor.apply(pdf,COR_ROTULO);
+    pdf.text("Medidor – D'Aluminium",12,ultimaY+4); pdf.text('Setor técnico',116,ultimaY+4);
+  }
+  baixarPdf(pdf,'Ficha_Medicao_Vaos_'+nomeArquivo(o.cliente)+(emBranco?'_em_branco':'')+'.pdf');
+  status('🟢 Ficha gerada · '+agoraHora());
+}
+
+// ---- RELATORIO DA VISITA (uma pagina, ate 6 fotos) ----
+function situacaoGeral(v){
+  const vs=(v.vaos||[]).filter(function(x){ return x.situacao!=='naovisto'; });
+  if(!vs.length) return {txt:'VÃOS: NÃO VERIFICADOS',cor:[110,118,128],fundo:[238,240,242]};
+  const lib=vs.filter(function(x){ return x.situacao==='liberado'; }).length;
+  if(lib===(v.vaos||[]).length) return {txt:'VÃOS: LIBERADOS',cor:[26,122,69],fundo:[237,250,243]};
+  if(!lib) return {txt:'VÃOS: NÃO LIBERADOS',cor:[192,57,43],fundo:[253,240,238]};
+  return {txt:'VÃOS: PARCIAL',cor:[122,78,7],fundo:[250,236,200]};
+}
+function visitasEmOrdem(a){ return (a.visitas||[]).slice().sort(function(x,y){ return String(x.data+x.hora).localeCompare(String(y.data+y.hora)); }); }
+// As fotos do relatorio: as marcadas "vai no relatorio" (ate 6); sem marca,
+// as 6 primeiras. Sem foto na visita, as fotos dos vaos tiradas naquele dia.
+function fotosDoRelatorio(a,v){
+  let todas=(v.fotos||[]).slice();
+  if(!todas.length){
+    a.esquadrias.forEach(function(e){ (e.fotos||[]).forEach(function(f){
+      if(diaLocal(f.quando)===v.data) todas.push(f);
+    }); });
+  }
+  const marcadas=todas.filter(function(f){ return f.noRelatorio; });
+  const usar=(marcadas.length?marcadas:todas).slice(0,6);
+  return {usar:usar, total:todas.length};
+}
+async function gerarRelatorioPdf(visitaId,paraEnviar){
+  const o=obraPorId(obraAberta), a=acompDaObra(obraAberta);
+  const v=a&&(a.visitas||[]).find(function(x){ return x.id===visitaId; });
+  if(!o||!v) return null;
+  status('📄 Montando o relatório...');
+  let jsPDF; try{ jsPDF=await carregarJsPDF(); }catch(e){ status(''); aviso('Não consegui gerar o PDF',e.message); return null; }
+  const pdf=new jsPDF({unit:'mm',format:'a4',compress:true});
+  const ordem=visitasEmOrdem(a), n=ordem.findIndex(function(x){ return x.id===v.id; })+1;
+  const hoje=fmtData(hojeISO());
+  pdfCabecalho(pdf,'RELATÓRIO DE VISITA À OBRA',true);
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(19); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  pdf.text(pdf.splitTextToSize(txt(o.cliente).toUpperCase(),186)[0],12,30);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor.apply(pdf,COR_ROTULO);
+  pdf.text(pdf.splitTextToSize([o.endereco,o.cidadeUF].filter(Boolean).join(' – '),186)[0]||'',12,35.5);
+  pdf.setFillColor.apply(pdf,COR_FUNDO); pdf.rect(12,40,186,20,'F');
+  [['Contrato',o.ct],['Início',fmtData(o.fechamento)],['Previsão',fmtData(o.entrega)],['Visita',n+' de '+ordem.length],['Emitido em',hoje]].forEach(function(c,i){
+    const x=16+i*36.5; pdfRotulo(pdf,c[0],x,45); pdfValor(pdf,c[1]||'—',x,51,11,true);
+  });
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(7.5); pdf.setTextColor.apply(pdf,COR_ROTULO);
+  pdf.text('Responsável pela visita: '+(v.quem||'______________________'),16,57);
+  pdf.setFontSize(9.5); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  pdf.text(pdf.splitTextToSize('Acompanhamos sua obra a cada visita para instalar as esquadrias assim que os vãos estiverem prontos. '+
+    'Este é o registro da visita de '+fmtData(v.data)+', com a situação dos vãos e as fotos do dia.',186),12,67);
+  pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineWidth(0.2); pdf.line(12,76,198,76);
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(12.5); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  pdf.text('Visita '+n+'  ·  '+fmtData(v.data)+(v.hora?' '+v.hora:'')+'  ·  '+(v.tipo||''),12,83);
+  const sg=situacaoGeral(v);
+  pdf.setFontSize(7.5); const ws=pdf.getTextWidth(sg.txt)+6;
+  pdf.setFillColor.apply(pdf,sg.fundo); pdf.roundedRect(198-ws,79.2,ws,5.4,2.5,2.5,'F');
+  pdf.setTextColor.apply(pdf,sg.cor); pdf.text(sg.txt,198-ws/2,83,{align:'center'});
+  let y=89;
+  const pend=(v.pendencias||[]).filter(function(p){ return p.texto||p.de; });
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_ROTULO);
+  if(pend.length){
+    const t='Aguardando: '+pend.map(function(p){ return txt(p.texto)+(p.de?' ('+p.de+')':''); }).join('; ')+'.';
+    const l=pdf.splitTextToSize(t,186).slice(0,3); pdf.text(l,12,y); y+=l.length*3.8;
+  } else { pdf.text('Sem pendências de terceiros nesta visita.',12,y); y+=3.8; }
+  const naoLib=(v.vaos||[]).filter(function(x){ return x.situacao==='nao'; });
+  if(naoLib.length){
+    const l=pdf.splitTextToSize('Vãos ainda não liberados: '+naoLib.map(function(x){ return x.tipo+(x.obs?' ('+x.obs+')':''); }).join('; ')+'.',186).slice(0,2);
+    pdf.text(l,12,y); y+=l.length*3.8;
+  }
+  if(v.obs){ const l=pdf.splitTextToSize('Observações: '+v.obs,186).slice(0,2); pdf.text(l,12,y); y+=l.length*3.8; }
+  // fotos 3 x 2
+  const fr=fotosDoRelatorio(a,v);
+  const yf=Math.max(y+3,96), wf=59, hf=44, gx=4.5;
+  for(let k=0;k<fr.usar.length;k++){
+    const col=k%3, lin=Math.floor(k/3);
+    const x=12+col*(wf+gx), yy=yf+lin*(hf+9);
+    const src=await fotoParaPdf(fr.usar[k],wf/hf);
+    if(src) pdf.addImage(src,'JPEG',x,yy,wf,hf); else pdfCaixa(pdf,x,yy,wf,hf,COR_FUNDO);
+    pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor.apply(pdf,COR_ROTULO);
+    pdf.text('Foto '+(k+1)+' · '+fmtData(diaLocal(fr.usar[k].quando)),x,yy+hf+3.3);
+  }
+  let yh=yf+(fr.usar.length>3?2:fr.usar.length?1:0)*(hf+9);
+  if(!fr.usar.length){ pdf.setFontSize(8.5); pdf.text('Nenhuma foto nesta visita.',12,yf+3); yh=yf+8; }
+  if(fr.total>fr.usar.length){ pdf.setFontSize(7.5); pdf.setTextColor.apply(pdf,COR_ROTULO); pdf.text('+'+(fr.total-fr.usar.length)+' foto(s) desta visita disponível(is) no sistema.',12,yh-2); }
+  yh+=3;
+  pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.line(12,yh,198,yh); yh+=7;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text('Histórico de visitas',12,yh); yh+=5;
+  ordem.slice(-6).forEach(function(x){
+    const i=ordem.indexOf(x)+1, esta=x.id===v.id;
+    pdf.setFont('helvetica',esta?'bold':'normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,esta?COR_TEXTO:COR_ROTULO);
+    pdf.text(i+'.  '+fmtData(x.data)+'  ·  '+(x.tipo||'')+'  ·  '+((x.fotos||[]).length)+' foto(s)'+(esta?'   (esta visita)':''),12,yh); yh+=4.2;
+  });
+  yh+=3;
+  pdf.setFont('helvetica','bold'); pdf.setFontSize(12); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text('Esquadrias',12,yh); yh+=5;
+  const conta=function(et){ return a.esquadrias.filter(function(e){ return !e.foraDaRevisao && (e.etapa||'medir')===et; }).length; };
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_TEXTO);
+  pdf.text('Total: '+a.esquadrias.filter(function(e){ return !e.foraDaRevisao; }).length+'   ·   A medir: '+conta('medir')+'   ·   Medidas: '+conta('campo')+
+    '   ·   Em análise técnica: '+conta('tecnico')+'   ·   Liberadas para produção: '+conta('producao'),12,yh);
+  const ya=Math.max(yh+18,262);
+  pdf.setDrawColor.apply(pdf,COR_TEXTO); pdf.setLineWidth(0.25); pdf.line(12,ya,94,ya); pdf.line(116,ya,198,ya);
+  pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor.apply(pdf,COR_ROTULO);
+  pdf.text("Responsável pela visita – D'Aluminium",12,ya+4); pdf.text('Ciente do cliente',116,ya+4);
+  pdf.setDrawColor.apply(pdf,COR_LINHA); pdf.setLineWidth(0.2); pdf.line(12,284,198,284);
+  pdf.setFontSize(7.5); pdf.text(txt(o.cliente)+' · Contrato '+txt(o.ct)+' · Emitido em '+hoje,12,289); pdf.text('Página 1',198,289,{align:'right'});
+  const nome='Relatorio_Visita_'+nomeArquivo(o.cliente)+'_'+fmtData(v.data).replace(/\//g,'-')+'.pdf';
+  baixarPdf(pdf,nome);
+  status('🟢 Relatório gerado · '+agoraHora());
+  return {nome:nome, situacao:sg.txt, pend:pend, v:v, o:o};
+}
+
+// ---- WHATSAPP (igual a Obra: chama o aplicativo; quem envia e a pessoa) ----
+var _urlWhats='';
+function numeroWhats(n){
+  const so=String(n||'').replace(/\D/g,'');
+  if(!so) return '';
+  if(so.length===10||so.length===11) return '55'+so;
+  if(so.length<12) return '';
+  return so;
+}
+function fecharAvisoWhats(){ const cx=document.getElementById('whats-fallback'); if(cx) cx.remove(); }
+window.addEventListener('focus',fecharAvisoWhats);
+document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') fecharAvisoWhats(); });
+function abrirWhats(url){
+  _urlWhats=url;
+  const doApp=String(url).replace('https://api.whatsapp.com/send?','whatsapp://send?');
+  let atendeu=false;
+  const aoSumir=function(){ if(document.visibilityState==='hidden') atendeu=true; };
+  document.addEventListener('visibilitychange',aoSumir); window.addEventListener('blur',aoSumir);
+  setTimeout(function(){
+    document.removeEventListener('visibilitychange',aoSumir); window.removeEventListener('blur',aoSumir);
+    if(!atendeu) mostrarBotaoWhats();
+  },1400);
+  try{ location.href=doApp; }catch(e){ mostrarBotaoWhats(); }
+}
+function mostrarBotaoWhats(){
+  let cx=document.getElementById('whats-fallback');
+  if(!cx){ cx=document.createElement('div'); cx.id='whats-fallback';
+    cx.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
+    document.body.appendChild(cx); }
+  cx.innerHTML='<div style="background:#fff;border-radius:12px;padding:20px 22px;max-width:380px;text-align:center">'+
+    '<div style="font-size:14px;font-weight:700;margin-bottom:8px">Abrir o WhatsApp</div>'+
+    '<div style="font-size:12.5px;color:#555;line-height:1.5;margin-bottom:14px">A mensagem já está pronta. <strong>Se o WhatsApp já abriu, pode fechar este aviso.</strong></div>'+
+    '<button type="button" class="btn btn-cor" onclick="abrirWhatsAgora()" style="background:#25D366;border-color:#25D366">Abrir a conversa</button>'+
+    '<div style="margin-top:12px"><button type="button" class="btn btn-outline btn-sm" onclick="fecharAvisoWhats()">Fechar</button></div></div>';
+  cx.onclick=function(e){ if(e.target===cx) fecharAvisoWhats(); };
+}
+function abrirWhatsAgora(){ fecharAvisoWhats(); let w=null; try{ w=window.open(_urlWhats,'_blank'); }catch(e){} if(!w) location.href=_urlWhats; }
+async function enviarRelatorioWhats(visitaId){
+  const r=await gerarRelatorioPdf(visitaId,true);
+  if(!r) return;
+  const primeiro=String(r.o.cliente||'').trim().split(/\s+/)[0]||'';
+  const nomeBonito=primeiro?primeiro.charAt(0).toUpperCase()+primeiro.slice(1).toLowerCase():'';
+  const pend=r.pend.length?'\n\nAguardando: '+r.pend.map(function(p){ return txt(p.texto)+(p.de?' ('+p.de+')':''); }).join('; ')+'.':'';
+  const frase={'VÃOS: LIBERADOS':'Todos os vãos estão liberados para a instalação.',
+    'VÃOS: PARCIAL':'Parte dos vãos já está liberada para a instalação.',
+    'VÃOS: NÃO LIBERADOS':'Os vãos ainda não estão liberados para a instalação.'}[r.situacao]||'';
+  const msg='Olá'+(nomeBonito?', '+nomeBonito:'')+'! Segue o relatório da visita de '+fmtData(r.v.data)+' à sua obra.'+
+    (frase?'\n\n'+frase:'')+pend+'\n\nQualquer dúvida, estamos à disposição.\nD\'Aluminium';
+  const num=numeroWhats(r.o.contato);
+  const url='https://api.whatsapp.com/send?'+(num?'phone='+num+'&':'')+'text='+encodeURIComponent(msg);
+  aviso('Relatório baixado','O arquivo "'+r.nome+'" foi baixado.\n\nAgora vamos abrir o WhatsApp'+(num?' na conversa do cliente':'')+' com a mensagem pronta. '+
+    'Na conversa, toque no clipe (📎) → Documento e escolha o arquivo baixado.\n\n'+
+    'O WhatsApp não aceita receber o arquivo direto do navegador: chega sem o nome.'+(num?'':'\n\nA obra não tem telefone cadastrado: escolha o contato no WhatsApp.'),
+    function(){ abrirWhats(url); });
+}
+
+// ================= CROQUIS (22/10/2026) =================
+// A biblioteca de croquis do SmartCEM (~8 mil desenhos de tipologia) fica no
+// Cloudinary, pasta privada daluminium_croquis, cada um com o proprio codigo
+// como nome. A LISTA dos codigos fica em croquis-lista.json, ao lado deste
+// arquivo (nao e dado de ninguem). Uso: quando o PDF vem sem desenho ou com o
+// desenho errado, a pessoa escolhe o croqui; o desenho do PDF continua sendo
+// o padrao. A esquadria guarda so {id, nome} em e.croqui.
+const PASTA_CROQUIS='daluminium_croquis';
+let _listaCroquis=null;
+function carregarListaCroquis(){
+  if(_listaCroquis) return _listaCroquis;
+  _listaCroquis=fetch('croquis-lista.json',{cache:'no-store'}).then(function(r){
+    if(!r.ok) throw new Error('lista de croquis não encontrada ('+r.status+')');
+    return r.json();
+  }).then(function(j){
+    return (j.itens||[]).map(function(i){ return {nome:i[0], id:i[1], fam:familiaDoCroqui(i[0])}; });
+  });
+  _listaCroquis.catch(function(){ _listaCroquis=null; });
+  return _listaCroquis;
+}
+// Familia = as letras do comeco do codigo (ALC, HYD, EX, PPV...).
+function familiaDoCroqui(nome){ const m=String(nome).toUpperCase().match(/^[A-Z]+/); return m?m[0]:'OUTROS'; }
+// Enderecos das miniaturas, pedidos ao Worker em lotes de ate 60.
+const _croquiLink={};
+async function linksDeCroquis(ids){
+  const faltam=ids.filter(function(id){ return !_croquiLink[id]; });
+  for(let i=0;i<faltam.length;i+=60){
+    const lote=faltam.slice(i,i+60);
+    const r=await fetch(WORKER,{method:'POST',cache:'no-store',
+      headers:cabecalhos({'Content-Type':'application/json','X-Action':'croquis-links'}),
+      body:JSON.stringify({ids:lote})});
+    let j=null; try{ j=await r.json(); }catch(e){}
+    if(r.status===401){ sessaoExpirada(); throw new Error('sessão expirada'); }
+    if(!r.ok||!j||!j.links) throw new Error((j&&j.erro)||('erro '+r.status));
+    Object.keys(j.links).forEach(function(k){ _croquiLink[k]=j.links[k]; });
+  }
+  return ids.map(function(id){ return _croquiLink[id]; });
+}
+// O croqui como imagem local (para a tela e para o PDF).
+const _croquiImg={};
+function imagemDoCroqui(id){
+  if(_croquiImg[id]) return _croquiImg[id];
+  _croquiImg[id]=(async function(){
+    const u=(await linksDeCroquis([id]))[0];
+    const r=await fetch(u);
+    if(!r.ok) throw new Error(r.status===404?'este croqui ainda não foi carregado na nuvem':'croqui '+r.status);
+    const b=await r.blob();
+    return await new Promise(function(ok){ const fr=new FileReader(); fr.onload=function(){ ok(fr.result); }; fr.readAsDataURL(b); });
+  })();
+  _croquiImg[id].catch(function(){ delete _croquiImg[id]; });
+  return _croquiImg[id];
+}
+
+// ---- Janela "Escolher croqui" ----
+let _escolhaCroqui={esqId:null, fam:'', busca:'', pagina:0};
+const CROQUIS_POR_PAGINA=48;
+async function abrirEscolhaCroqui(esqId){
+  if(recusarSeConsulta()) return;
+  _escolhaCroqui={esqId:esqId, fam:_escolhaCroqui.fam||'', busca:'', pagina:0};
+  document.getElementById('croqui-ov').classList.add('open');
+  document.getElementById('croqui-corpo').innerHTML='<div class="vazio">Carregando a lista...</div>';
+  try{ await carregarListaCroquis(); }
+  catch(e){ document.getElementById('croqui-corpo').innerHTML='<div class="vazio">Não consegui abrir a lista de croquis: '+esc(e.message)+'</div>'; return; }
+  desenharEscolhaCroqui();
+}
+function fecharEscolhaCroqui(){ document.getElementById('croqui-ov').classList.remove('open'); }
+async function desenharEscolhaCroqui(){
+  const lista=await carregarListaCroquis();
+  const contagem={}; lista.forEach(function(c){ contagem[c.fam]=(contagem[c.fam]||0)+1; });
+  const fams=Object.keys(contagem).sort(function(a,b){ return contagem[b]-contagem[a] || a.localeCompare(b); });
+  const q=semAcento(_escolhaCroqui.busca).toUpperCase().replace(/[^A-Z0-9]+/g,'');
+  const filtrados=lista.filter(function(c){
+    if(_escolhaCroqui.fam && c.fam!==_escolhaCroqui.fam) return false;
+    if(q && semAcento(c.nome).toUpperCase().replace(/[^A-Z0-9]+/g,'').indexOf(q)<0) return false;
+    return true;
+  });
+  const paginas=Math.max(1,Math.ceil(filtrados.length/CROQUIS_POR_PAGINA));
+  if(_escolhaCroqui.pagina>=paginas) _escolhaCroqui.pagina=paginas-1;
+  const pag=filtrados.slice(_escolhaCroqui.pagina*CROQUIS_POR_PAGINA,(_escolhaCroqui.pagina+1)*CROQUIS_POR_PAGINA);
+  const e=esquadriaNaTela(_escolhaCroqui.esqId);
+  let h='<div class="depois" style="margin-bottom:8px">'+(e?'Para a <b>'+esc(e.tipo||e.tipoPdf)+'</b>'+(e.projeto&&e.projeto.descricao?' — '+esc(e.projeto.descricao):''):'')+'</div>'+
+    '<div class="grade2" style="grid-template-columns:1fr 1.4fr">'+
+    '<div class="fg"><label>Família</label><select onchange="_escolhaCroqui.fam=this.value;_escolhaCroqui.pagina=0;desenharEscolhaCroqui()">'+
+      '<option value="">Todas ('+lista.length+')</option>'+fams.map(function(f){ return '<option value="'+esc(f)+'"'+(f===_escolhaCroqui.fam?' selected':'')+'>'+esc(f)+' ('+contagem[f]+')</option>'; }).join('')+'</select></div>'+
+    '<div class="fg"><label>Buscar pelo código</label><input id="croqui-busca" placeholder="Ex.: JC200, MAX100, ABT" value="'+esc(_escolhaCroqui.busca)+'" '+
+      'oninput="_escolhaCroqui.busca=this.value;_escolhaCroqui.pagina=0;clearTimeout(window._tBuscaCroqui);window._tBuscaCroqui=setTimeout(desenharEscolhaCroqui,350)"></div></div>';
+  h+='<div class="depois" style="margin:6px 0">'+filtrados.length+' croqui(s)'+(paginas>1?' · página '+(_escolhaCroqui.pagina+1)+' de '+paginas:'')+'</div>';
+  h+='<div class="croquis-grade">'+pag.map(function(c){
+    return '<button class="croqui-cel" onclick="escolherCroqui(\''+esc(c.id)+'\')" title="'+esc(c.nome)+'"><img data-croqui="'+esc(c.id)+'" alt="" '+
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'croqui-falta\',textContent:\'ainda não carregado\'}))"><span>'+esc(c.nome)+'</span></button>';
+  }).join('')+'</div>';
+  if(paginas>1) h+='<div class="midia-botoes" style="justify-content:center">'+
+    '<button class="btn btn-outline btn-sm"'+(_escolhaCroqui.pagina?'':' disabled')+' onclick="_escolhaCroqui.pagina--;desenharEscolhaCroqui()">← anteriores</button>'+
+    '<button class="btn btn-outline btn-sm"'+(_escolhaCroqui.pagina<paginas-1?'':' disabled')+' onclick="_escolhaCroqui.pagina++;desenharEscolhaCroqui()">próximos →</button></div>';
+  const corpo=document.getElementById('croqui-corpo');
+  const foco=document.activeElement&&document.activeElement.id==='croqui-busca';
+  corpo.innerHTML=h;
+  if(foco){ const b=document.getElementById('croqui-busca'); b.focus(); b.setSelectionRange(b.value.length,b.value.length); }
+  try{
+    const links=await linksDeCroquis(pag.map(function(c){ return c.id; }));
+    pag.forEach(function(c,i){ const im=corpo.querySelector('img[data-croqui="'+c.id+'"]'); if(im) im.src=links[i]; });
+  }catch(err){ corpo.insertAdjacentHTML('afterbegin','<div class="aviso-linha aviso-verm">Não consegui mostrar as miniaturas: '+esc(err.message)+'</div>'); }
+}
+async function escolherCroqui(id){
+  const lista=await carregarListaCroquis();
+  const c=lista.find(function(x){ return x.id===id; }); if(!c) return;
+  const esqId=_escolhaCroqui.esqId;
+  fecharEscolhaCroqui();
+  await trocarCroqui(esqId,{id:c.id,nome:c.nome});
+}
+// Grava direto (nao passa pelo rascunho das medidas), como as fotos.
+async function trocarCroqui(esqId,croqui){
+  const o=obraPorId(obraAberta)||{};
+  const deu=await alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    const e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(!e) return false;
+    const antes=e.croqui?e.croqui.nome:'(desenho do PDF)';
+    if(croqui) e.croqui=croqui; else { if(!e.croqui) return false; delete e.croqui; }
+    if(!Array.isArray(e.historico)) e.historico=[];
+    e.historico.push({quando:agoraISO(),quem:usuario,campo:'croqui',de:antes,para:croqui?croqui.nome:'(desenho do PDF)'});
+  },{acao:croqui?'escolheu croqui':'voltou ao desenho do PDF', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:croqui?croqui.nome:''});
+  if(deu){
+    redesenharFicha(esqId);
+    // redesenharFicha reaproveita a imagem antiga; aqui o desenho mudou.
+    const a=acompDaObra(obraAberta), e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(a&&e){ const d=document.getElementById('desenho-'+esqId); if(d) d.textContent='carregando...'; mostrarDesenho(a,e); }
+  }
+}
+function voltarDesenhoDoPdf(esqId){
+  if(!confirm('Voltar a usar o desenho que veio no PDF?')) return;
+  trocarCroqui(esqId,null);
+}
+
+// ---- Carregar a biblioteca na nuvem (so admin, uma vez) ----
+// A pessoa descompacta o Croquis.zip e escolhe a PASTA. O sistema sobe cada
+// imagem com o codigo como nome. O Worker assina com overwrite=false: subir
+// de novo o que ja esta la nao estraga nada, e o navegador lembra o que ja
+// foi (localStorage), para recomecar de onde parou.
+const LS_CROQUIS_SUBIDOS='dalum-croquis-subidos';
+let _carga=null;
+function croquisJaSubidos(){ try{ return new Set(JSON.parse(localStorage.getItem(LS_CROQUIS_SUBIDOS)||'[]')); }catch(e){ return new Set(); } }
+function guardarSubidos(s){ try{ localStorage.setItem(LS_CROQUIS_SUBIDOS,JSON.stringify(Array.from(s))); }catch(e){} }
+async function abrirCargaCroquis(){
+  if(!soAdmin()){ aviso('Só o administrador','Só o administrador carrega a biblioteca de croquis.'); return; }
+  document.getElementById('croqui-ov').classList.add('open');
+  const corpo=document.getElementById('croqui-corpo');
+  corpo.innerHTML='<div class="vazio">Carregando a lista...</div>';
+  let lista; try{ lista=await carregarListaCroquis(); }catch(e){ corpo.innerHTML='<div class="vazio">'+esc(e.message)+'</div>'; return; }
+  const subidos=croquisJaSubidos();
+  const ja=lista.filter(function(c){ return subidos.has(c.id); }).length;
+  corpo.innerHTML='<div style="font-size:13.5px;line-height:1.6">'+
+    '<b>Biblioteca de croquis na nuvem</b><br>'+
+    'A lista tem <b>'+lista.length+'</b> croquis. Por este computador já subiram <b>'+ja+'</b>.<br><br>'+
+    '1. Descompacte o <b>Croquis.zip</b> (botão direito → Extrair tudo).<br>'+
+    '2. Clique em <b>Escolher a pasta</b> e selecione a pasta <b>Croquis</b>.<br>'+
+    '3. Deixe esta tela aberta até terminar (uns 15 a 20 minutos). Se parar, é só fazer de novo: continua de onde parou.</div>'+
+    '<div class="midia-botoes" style="margin-top:12px"><label class="btn btn-cor">📁 Escolher a pasta<input type="file" webkitdirectory multiple hidden onchange="iniciarCargaCroquis(this)"></label></div>'+
+    '<div id="carga-status" style="margin-top:12px"></div>';
+}
+async function iniciarCargaCroquis(input){
+  const arquivos=Array.prototype.slice.call(input.files||[]); input.value='';
+  const lista=await carregarListaCroquis();
+  // Compara pelo CODIGO DA NUVEM, nao pelo nome escrito: nome com acento
+  // ("MANUTENÇÃO") sai do zip escrito de outro jeito no Windows, e 4 croquis
+  // ficaram de fora na primeira carga (23/10/2026). O codigo troca todo
+  // caractere estranho por "_" — o acento, de qualquer jeito, vira o mesmo.
+  const porNome={}; lista.forEach(function(c){ porNome[c.id.toUpperCase()]=c; });
+  const idDoArquivo=function(n){ return n.replace(/\.png$/i,'').replace(/[^A-Za-z0-9_-]/g,'_').replace(/_{2,}/g,'_').replace(/^_+|_+$/g,'').toUpperCase(); };
+  const subidos=croquisJaSubidos();
+  const fila=[]; let foraDaLista=0, achados=0;
+  arquivos.forEach(function(f){
+    if(!/\.png$/i.test(f.name)) return;
+    const c=porNome[idDoArquivo(f.name)];
+    if(!c){ foraDaLista++; return; }
+    achados++;
+    // O zip traz o mesmo croqui repetido com o acento escrito de varios
+    // jeitos: manda cada codigo uma vez so.
+    if(!subidos.has(c.id) && !fila.some(function(x){ return x.c.id===c.id; })) fila.push({f:f,c:c});
+  });
+  if(!achados){
+    const st0=document.getElementById('carga-status');
+    if(st0) st0.innerHTML='<div class="aviso-linha aviso-ambar">Não achei croquis nesta pasta ('+arquivos.length+' arquivo(s)). Escolha a pasta <b>Croquis</b> que saiu do zip.</div>';
+    return;
+  }
+  _carga={total:fila.length, feitos:0, erros:[], parar:false};
+  const st=document.getElementById('carga-status');
+  const mostrar=function(){
+    if(!st) return;
+    const pct=_carga.total?Math.round(_carga.feitos*100/_carga.total):100;
+    st.innerHTML='<div style="background:var(--gray-2);border-radius:6px;height:12px;overflow:hidden"><div style="background:var(--cor);height:12px;width:'+pct+'%"></div></div>'+
+      '<div style="font-size:13px;margin-top:6px">'+_carga.feitos+' de '+_carga.total+' enviados ('+pct+'%)'+(_carga.erros.length?' · <span style="color:var(--red)">'+_carga.erros.length+' com erro</span>':'')+
+      (foraDaLista?' · '+foraDaLista+' arquivo(s) fora da lista (ignorados)':'')+'</div>'+
+      (_carga.parar||_carga.feitos+_carga.erros.length>=_carga.total?'':'<button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="_carga.parar=true">Pausar</button>');
+  };
+  mostrar();
+  if(!fila.length){ st.insertAdjacentHTML('beforeend','<div class="aviso-linha aviso-azul" style="margin-top:8px">Nada a enviar: todos os croquis desta pasta já estão na nuvem.</div>'); return; }
+  let i=0;
+  const trabalhador=async function(){
+    while(i<fila.length && !_carga.parar){
+      const it=fila[i++];
+      try{
+        const r=await fetch(WORKER,{method:'POST',cache:'no-store',
+          headers:cabecalhos({'Content-Type':'application/json','X-Action':'assinar-envio'}),
+          body:JSON.stringify({pasta:PASTA_CROQUIS, publicId:it.c.id})});
+        let a=null; try{ a=await r.json(); }catch(e){}
+        if(r.status===401){ sessaoExpirada(); _carga.parar=true; return; }
+        if(!r.ok||!a||!a.signature) throw new Error((a&&a.erro)||('assinatura '+r.status));
+        const fd=new FormData();
+        fd.append('file',it.f); fd.append('api_key',a.api_key); fd.append('timestamp',a.timestamp);
+        fd.append('signature',a.signature); fd.append('public_id',a.public_id); fd.append('overwrite',a.overwrite); fd.append('type',a.type);
+        const up=await fetch('https://api.cloudinary.com/v1_1/'+a.conta+'/image/upload',{method:'POST',body:fd});
+        if(!up.ok){ let t=''; try{ t=await up.text(); }catch(e){} throw new Error('nuvem '+up.status+' '+t.slice(0,80)); }
+        subidos.add(it.c.id);
+        _carga.feitos++;
+        if(_carga.feitos%25===0) guardarSubidos(subidos);
+      }catch(err){ _carga.erros.push(it.c.nome+': '+err.message); }
+      mostrar();
+    }
+  };
+  await Promise.all([trabalhador(),trabalhador(),trabalhador(),trabalhador()]);
+  guardarSubidos(subidos);
+  mostrar();
+  st.insertAdjacentHTML('beforeend',_carga.parar
+    ?'<div class="aviso-linha aviso-ambar" style="margin-top:8px">Pausado. Para continuar, escolha a pasta de novo.</div>'
+    :'<div class="aviso-linha aviso-azul" style="margin-top:8px">Terminado. '+_carga.feitos+' croqui(s) enviado(s)'+(_carga.erros.length?'; '+_carga.erros.length+' com erro — escolha a pasta de novo para tentar só esses.':'.')+'</div>');
+  if(_carga.erros.length) console.warn('Croquis com erro:',_carga.erros);
+}
+
+// ================= MONTAR AS FICHAS A PARTIR DO PDF =================
+function docsDeMedicao(o){ return (o&&Array.isArray(o.docs))?o.docs.filter(function(d){ return d&&d.url; }):[]; }
+function acompDaObra(id){ return (dados.acompanhamentos||[]).find(function(a){ return a.ctoId===id; })||null; }
+function obraPorId(id){ return obras.find(function(o){ return o.id===id; })||null; }
+
+// Le todos os PDFs de medicao da obra e fica com a revisao mais alta.
+async function lerMedicaoDaObra(o){
+  const docs=docsDeMedicao(o);
+  if(!docs.length) throw new Error('esta obra não tem o PDF de medição anexado na Obra (rótulo "Medição")');
+  const lidos=[];
+  for(const d of docs){
+    try{ const r=await lerSmartCem(d); if(r.esquadrias.length) lidos.push({doc:d,r:r}); }
+    catch(e){ console.warn('Não consegui ler',d.nome,e); }
+  }
+  if(!lidos.length) throw new Error('não achei esquadrias no PDF de medição. Confira se é o PDF original do SmartCEM');
+  lidos.sort(function(a,b){ return b.r.revisao-a.r.revisao || String(b.doc.quando||'').localeCompare(String(a.doc.quando||'')); });
+  return {escolhido:lidos[0], total:docs.length};
+}
+
+// Mesmo cliente se os dois nomes tiverem pelo menos uma palavra de verdade em
+// comum (sem acento; fora "de", "da", "dos"...). "CAROLINE SANTOS" e
+// "CAROLINE SANTOS MATOS" batem; "PEDRO MARCELINO" e "SIDNEY SOBRINHO" nao.
+// Folgado de proposito: obra cadastrada com apelido ou nome do casal nao
+// pode virar alarme falso.
+function mesmoCliente(a,b){
+  const palavras=function(s){ return semAcento(s).toUpperCase().split(/[^A-Z0-9]+/).filter(function(p){ return p.length>=3 && ['DOS','DAS','EM','COM','LTDA','EIRELI','OBRA','RESIDENCIA','CASA'].indexOf(p)<0; }); };
+  const pa=palavras(a), pb=palavras(b);
+  if(!pa.length||!pb.length) return true;
+  return pa.some(function(p){ return pb.indexOf(p)>=0; });
+}
+function avisosDaLeitura(o, lido, anterior){
+  const avisos=[];
+  const pdfProp=lido.escolhido.r.proposta;
+  const cliPdf=lido.escolhido.r.cliente||'';
+  if(cliPdf && o.cliente && !mesmoCliente(cliPdf,o.cliente))
+    avisos.push('O cliente no PDF é "'+cliPdf+'", e a obra é "'+o.cliente+'". Confira se o PDF anexado é desta obra.');
+  const todas=lido.escolhido.r.propostas||[];
+  if(todas.length>1) avisos.push('Este PDF junta '+todas.length+' propostas: '+todas.join(', ')+'. Confira se todas são desta obra.');
+  if(lido.total>1) avisos.push('Há '+lido.total+' PDFs de medição nesta obra. Usei o da revisão mais alta: '+nomeRev(lido.escolhido.r.revisao)+' ("'+lido.escolhido.doc.nome+'").');
+  if(!o.proposta) avisos.push('A ficha da obra não tem o nº da proposta (ORC). O PDF diz '+(pdfProp||'(sem número)')+'.');
+  else if(pdfProp && propostaSemRevisao(pdfProp)!==propostaSemRevisao(o.proposta))
+    avisos.push('O nº da proposta no PDF ('+pdfProp+') é diferente do cadastrado na obra ('+o.proposta+'). Confira se o PDF é desta obra.');
+  else if(pdfProp && revisaoDe(pdfProp)!==revisaoDe(o.proposta))
+    avisos.push('O PDF é da revisão '+nomeRev(revisaoDe(pdfProp))+' e a obra está cadastrada com a '+nomeRev(revisaoDe(o.proposta))+'.');
+  if(anterior && anterior.revisao!==undefined && anterior.revisao!==lido.escolhido.r.revisao)
+    avisos.push('A revisão mudou: era '+nomeRev(anterior.revisao)+', agora é '+nomeRev(lido.escolhido.r.revisao)+'. As medidas já digitadas foram mantidas.');
+  return avisos;
+}
+
+function esquadriaNova(e, doc){
+  return {
+    id:novoId(), tipoPdf:e.tipo,
+    projeto:{tipo:e.tipo,local:e.local,qtde:e.qtde,dimL:e.dimL,dimH:e.dimH,dimTxt:e.dimTxt,cor:e.cor,vidro:e.vidro,descricao:e.descricao,linha:e.linha||''},
+    desenho:e.desenho?Object.assign({doc:doc.id},e.desenho):null,
+    notas:e.notas,
+    tipo:e.tipo, local:e.local,
+    lCima:'',lMeio:'',lBaixo:'',hEsq:'',hCentro:'',hDir:'',d1:'',d2:'',
+    condicao:'', faltas:'', faltaOutro:'', obs:'', folgaL:'', folgaH:'',
+    etapa:'medir', visto:null, historico:[]
+  };
+}
+
+// Primeira leitura (ou releitura) do PDF. Na releitura as medidas digitadas
+// ficam: muda so o que veio do projeto. Esquadria que saiu do PDF novo NAO e
+// apagada — fica marcada, para alguem decidir.
+async function montarFichas(o, releitura){
+  if(recusarSeConsulta()) return;
+  status('📄 Lendo o PDF...');
+  let lido;
+  try{ lido=await lerMedicaoDaObra(o); }
+  catch(e){ status(''); aviso('Não consegui montar as fichas', 'Motivo: '+e.message+'.'); return; }
+  const doc=lido.escolhido.doc, r=lido.escolhido.r;
+  const deu=await alterar(function(base){
+    let a=base.acompanhamentos.find(function(x){ return x.ctoId===o.id; });
+    const anterior=a?a.origem:null;
+    if(a && !releitura) return false;   // outra pessoa montou enquanto isso
+    if(!a){ a={id:novoId(),ctoId:o.id,esquadrias:[],criadoEm:agoraISO(),criadoPor:usuario}; base.acompanhamentos.push(a); }
+    a.ct=o.ct; a.cliente=o.cliente;
+    a.origem={doc:doc.id,nome:doc.nome,url:doc.url,proposta:r.proposta,revisao:r.revisao,lidoEm:agoraISO(),lidoPor:usuario,
+              docsVistos:docsDeMedicao(o).map(function(d){ return d.id; })};
+    a.avisos=avisosDaLeitura(o,lido,anterior);
+    // Releitura de fichas em que NINGUEM digitou nada: remonta do zero. E o
+    // caso de PDF lido errado por versao antiga do leitor (22/10/2026: o
+    // segundo modelo do SmartCEM juntava tudo no Tipo — "J01 1 600 3350
+    // GOLD" — e a ficha nao casava mais com o "J01" lido certo).
+    if(releitura && a.esquadrias.every(semNadaDigitado)) a.esquadrias=[];
+    const vistos={};
+    r.esquadrias.forEach(function(e){
+      const ja=a.esquadrias.find(function(x){ return !vistos[x.id] && String(x.tipoPdf).toUpperCase()===String(e.tipo).toUpperCase(); });
+      if(ja){
+        vistos[ja.id]=1;
+        ja.projeto={tipo:e.tipo,local:e.local,qtde:e.qtde,dimL:e.dimL,dimH:e.dimH,dimTxt:e.dimTxt,cor:e.cor,vidro:e.vidro,descricao:e.descricao,linha:e.linha||''};
+        ja.desenho=e.desenho?Object.assign({doc:doc.id},e.desenho):null;
+        ja.notas=e.notas;
+        delete ja.foraDaRevisao;
+      } else {
+        const n=esquadriaNova(e,doc); vistos[n.id]=1; a.esquadrias.push(n);
+      }
+    });
+    a.esquadrias.forEach(function(x){ if(!vistos[x.id]) x.foraDaRevisao=true; });
+  }, {acao:releitura?'releu a medição':'montou as fichas', alvo:(o.ct?o.ct+' · ':'')+o.cliente,
+      detalhe:r.esquadrias.length+' esquadria(s) · '+(r.proposta||doc.nome)});
+  if(deu){ baseFichas={}; rascunho={}; render(); }
+}
+
+// ================= TELA =================
+function render(){
+  const tela=document.getElementById('tela');
+  if(!tela) return;
+  document.getElementById('btn-voltar').style.display=obraAberta?'':'none';
+  if(obraAberta) renderObra(tela); else renderLista(tela);
+  atualizarBarraSalvar();
+}
+
+let _busca='';
+function renderLista(tela){
+  const q=semAcento(_busca);
+  const ordem=function(o){ const a=acompDaObra(o.id); return a?0:(docsDeMedicao(o).length?1:2); };
+  const lista=obras.filter(function(o){
+    if(!q) return true;
+    return semAcento([o.ct,o.cliente,o.coord,o.status,o.proposta].join(' ')).indexOf(q)>=0;
+  }).sort(function(a,b){ return ordem(a)-ordem(b) || String(a.cliente).localeCompare(String(b.cliente)); });
+  // A busca e desenhada uma vez so: redesenhar o campo a cada letra tirava o
+  // cursor do lugar.
+  if(!document.getElementById('busca')){
+    tela.innerHTML='<input class="busca" id="busca" placeholder="Buscar obra, contrato, cliente, coordenador..." value="'+esc(_busca)+'" '+
+      'oninput="_busca=this.value;renderLista(document.getElementById(\'tela\'));">'+
+      (soAdmin()?'<div style="text-align:right;margin:-4px 0 10px"><button class="btn btn-outline btn-sm" onclick="abrirCargaCroquis()">🖼 Biblioteca de croquis</button></div>':'')+
+      '<div id="lista-obras"></div>';
+  }
+  let h='';
+  if(!obras.length) h+='<div class="vazio">Nenhuma obra veio do Gerenciamento de Obra ainda.</div>';
+  else if(!lista.length) h+='<div class="vazio">Nada encontrado para "'+esc(_busca)+'".</div>';
+  h+='<div class="lista-obras">';
+  lista.forEach(function(o){
+    const a=acompDaObra(o.id), docs=docsDeMedicao(o);
+    let selo;
+    if(a){
+      const n=a.esquadrias.length, prod=a.esquadrias.filter(function(e){ return e.etapa==='producao'; }).length;
+      selo='<span class="pill pill-cor">'+n+' esquadria'+(n===1?'':'s')+(prod?' · '+prod+' liberada'+(prod===1?'':'s'):'')+'</span>';
+    } else if(docs.length) selo='<span class="pill pill-ambar">📎 medição anexada</span>';
+    else selo='<span class="pill">sem medição</span>';
+    h+='<div class="obra-linha'+(a||docs.length?' tem-med':'')+'" onclick="abrirObra(\''+esc(o.id)+'\')">'+
+      '<div class="obra-ct">'+esc(o.ct||'—')+'</div>'+
+      '<div style="flex:1;min-width:0"><div class="obra-nome">'+esc(o.cliente||'(sem nome)')+'</div>'+
+      '<div class="obra-sub">'+esc([o.status, o.coord?'Coord.: '+o.coord:'', o.entrega?'Entrega '+fmtData(o.entrega):''].filter(Boolean).join(' · '))+'</div></div>'+
+      selo+'</div>';
+  });
+  h+='</div>';
+  document.getElementById('lista-obras').innerHTML=h;
+}
+
+function abrirObra(id){
+  obraAberta=id;
+  try{ sessionStorage.setItem('dalum-acomp-aberta',id); }catch(e){}
+  baseFichas={};
+  render();
+  window.scrollTo(0,0);
+  const o=obraPorId(id);
+  // Primeira vez que a obra e aberta com o PDF anexado: monta sozinho.
+  if(o && !acompDaObra(id) && docsDeMedicao(o).length && !ehConsulta()) montarFichas(o,false);
+}
+function voltarParaLista(){
+  if(temRascunho() && !confirm('Há medidas não salvas nesta obra. Voltar e perder o que foi digitado?')) return;
+  rascunho={}; baseFichas={};
+  obraAberta=null;
+  try{ sessionStorage.removeItem('dalum-acomp-aberta'); }catch(e){}
+  render();
+}
+
+function itemCab(rotulo, valor){
+  return '<div class="cab-item"><label>'+esc(rotulo)+'</label><div>'+(valor?esc(valor):'<span class="falta">não preenchido na Obra</span>')+'</div></div>';
+}
+
+function renderObra(tela){
+  const o=obraPorId(obraAberta);
+  if(!o){ tela.innerHTML='<div class="vazio">Esta obra não está mais na lista do Gerenciamento de Obra.</div>'; return; }
+  const a=acompDaObra(o.id);
+  let h='<div class="cab"><div class="cab-topo"><div class="cab-titulo">'+esc(o.cliente)+'</div>'+
+    '<span class="pill pill-cor">CT '+esc(o.ct||'—')+'</span>'+(o.status?'<span class="pill">'+esc(o.status)+'</span>':'')+'</div>'+
+    '<div class="cab-grade">'+
+      itemCab('Endereço', [o.endereco,o.cidadeUF].filter(Boolean).join(' — '))+
+      itemCab('Telefone', o.contato)+
+      itemCab('Proposta (ORC)', o.proposta)+
+      itemCab('Coordenador', o.coord)+
+      itemCab('Início (fechamento)', fmtData(o.fechamento))+
+      itemCab('Previsão de entrega', fmtData(o.entrega))+
+    '</div>';
+  h+='<div style="font-size:11.5px;color:var(--gray-4);margin-top:8px">Estes dados vêm da ficha da obra no Gerenciamento de Obra. Para corrigir, corrija lá.</div>';
+  const avisos=[];
+  if(a){
+    (a.avisos||[]).forEach(function(t){ avisos.push('<div class="aviso-linha aviso-ambar">⚠️ '+esc(t)+'</div>'); });
+    const vistos=(a.origem&&a.origem.docsVistos)||[];
+    const novos=docsDeMedicao(o).filter(function(d){ return vistos.indexOf(d.id)<0; });
+    if(novos.length) avisos.push('<div class="aviso-linha aviso-azul">📄 Chegou PDF de medição novo na Obra ('+esc(novos.map(function(d){ return d.nome; }).join(', '))+'). '+
+      '<button class="btn btn-cor btn-sm" onclick="relerMedicao()">Ler de novo</button></div>');
+    if(a.origem) avisos.push('<div class="aviso-linha" style="background:var(--gray-2);color:var(--gray-5)">Fichas montadas de "'+esc(a.origem.nome)+'" ('+esc(a.origem.proposta||'sem nº')+') em '+esc(fmtQuando(a.origem.lidoEm))+' por '+esc(a.origem.lidoPor||'—')+'. '+
+      '<a href="#" onclick="verPdfOriginal();return false">Ver o PDF</a>'+(ehConsulta()?'':' · <a href="#" onclick="relerMedicao();return false">Ler o PDF de novo</a>')+'</div>');
+  }
+  if(avisos.length) h+='<div class="avisos">'+avisos.join('')+'</div>';
+  if(a) h+='<div class="pdf-botoes" style="margin-top:10px">'+
+    '<button class="btn btn-outline btn-sm" onclick="gerarFichaPdf(true)" title="Para imprimir e levar à obra">📄 Ficha de medição em branco</button>'+
+    '<button class="btn btn-outline btn-sm" onclick="gerarFichaPdf(false)">📄 Ficha de medição preenchida</button></div>';
+  h+='</div>';
+  if(!a){
+    if(docsDeMedicao(o).length) h+='<div class="vazio">Montando as fichas a partir do PDF de medição... <br><br>'+
+      (ehConsulta()?'':'<button class="btn btn-cor" onclick="montarFichas(obraPorId(obraAberta),false)">Montar as fichas agora</button>')+'</div>';
+    else h+='<div class="vazio">Esta obra ainda não tem o PDF de medição.<br><br>No <b>Gerenciamento de Obra</b>, abra a ficha da obra e anexe o PDF do SmartCEM com o rótulo <b>Medição</b>. Depois volte aqui.</div>';
+    tela.innerHTML=h;
+    return;
+  }
+  a.esquadrias.forEach(function(e){ if(!baseFichas[e.id]) baseFichas[e.id]=copia(e); });
+  h+=htmlVisitas(a);
+  a.esquadrias.forEach(function(e){ h+=htmlFicha(a,e); });
+  tela.innerHTML=h;
+  a.esquadrias.forEach(function(e){ mostrarDesenho(a,e); });
+  preencherMiniaturas(tela);
+  consertarDesenhosVelhos(o,a);
+}
+
+// Fichas montadas antes da correcao de 21/10/2026 guardaram o RODAPE do PDF
+// como desenho da ultima esquadria da pagina. O desenho do SmartCEM e uma
+// figura estreita na coluna da esquerda (uns 130 pontos); o rodape e uma
+// faixa larga. Achando um desses, le o PDF de novo uma vez, sozinho — a
+// releitura troca so o que veio do projeto, as medidas ficam.
+const _consertoTentado={};
+function desenhoSuspeito(d){ return !!d && (d.w>250 || d.x+d.w>300); }
+// Tipo lido com as medidas grudadas ("J01 1 600 3350 GOLD"): o PDF do segundo
+// modelo do SmartCEM lido pelo leitor antigo (antes de 22/10/2026).
+function tipoMalLido(e){ return /^\S+\s+\d+\s+\d+\s+\d+/.test(String(e.tipoPdf||'')); }
+function semNadaDigitado(e){
+  const campos=['lCima','lMeio','lBaixo','hEsq','hCentro','hDir','d1','d2','condicao','faltas','faltaOutro','obs','folgaL','folgaH'];
+  return campos.every(function(c){ return !e[c]; }) && !(e.fotos||[]).length && !(e.audios||[]).length && !e.croqui &&
+    (!e.etapa||e.etapa==='medir') && String(e.tipo||'')===String(e.tipoPdf||'') && String(e.local||'')===String((e.projeto||{}).local||'');
+}
+function consertarDesenhosVelhos(o,a){
+  if(_consertoTentado[a.id] || ehConsulta() || temRascunho() || _gravando) return;
+  if(!a.esquadrias.some(function(e){ return desenhoSuspeito(e.desenho) || tipoMalLido(e); })) return;
+  _consertoTentado[a.id]=true;
+  montarFichas(o,true);
+}
+
+// Valor na tela: o que foi digitado e nao salvo, senao o do banco.
+function valor(e,campo){
+  const r=rascunho[e.id];
+  if(r && Object.prototype.hasOwnProperty.call(r,campo)) return r[campo];
+  return e[campo]==null?'':e[campo];
+}
+function menor(vals){ const n=vals.map(mm).filter(function(x){ return x!==null; }); return n.length?Math.min.apply(null,n):null; }
+function contasDe(e){
+  const L=menor([valor(e,'lCima'),valor(e,'lMeio'),valor(e,'lBaixo')]);
+  const H=menor([valor(e,'hEsq'),valor(e,'hCentro'),valor(e,'hDir')]);
+  const fL=mm(valor(e,'folgaL')), fH=mm(valor(e,'folgaH'));
+  return {L:L,H:H,fL:fL,fH:fH,pL:(L!==null&&fL!==null)?L-fL:null,pH:(H!==null&&fH!==null)?H-fH:null};
+}
+
+function campoNum(e,campo,rot){
+  const v=valor(e,campo), mudou=rascunho[e.id]&&Object.prototype.hasOwnProperty.call(rascunho[e.id],campo);
+  return '<div class="fg"><label>'+esc(rot)+'</label><input inputmode="numeric" aria-label="'+esc((e.tipo||e.tipoPdf)+' · '+(CAMPOS_FICHA[campo]||rot))+'" data-e="'+e.id+'" data-c="'+campo+'" value="'+esc(v)+'"'+
+    (mudou?' class="mudou"':'')+(ehConsulta()?' disabled':'')+' oninput="digitou(this)" placeholder="mm"></div>';
+}
+function campoTxt(e,campo,rot,ph){
+  const v=valor(e,campo), mudou=rascunho[e.id]&&Object.prototype.hasOwnProperty.call(rascunho[e.id],campo);
+  return '<div class="fg"><label>'+esc(rot)+'</label><input aria-label="'+esc((e.tipo||e.tipoPdf)+' · '+(CAMPOS_FICHA[campo]||rot))+'" data-e="'+e.id+'" data-c="'+campo+'" value="'+esc(v)+'"'+
+    (mudou?' class="mudou"':'')+(ehConsulta()?' disabled':'')+' oninput="digitou(this)" placeholder="'+esc(ph||'')+'"></div>';
+}
+
+function htmlFicha(a,e){
+  const p=e.projeto||{};
+  const c=contasDe(e);
+  const suja=rascunho[e.id]&&Object.keys(rascunho[e.id]).length;
+  const etapa=valor(e,'etapa')||'medir';
+  const cond=valor(e,'condicao');
+  const faltas=String(valor(e,'faltas')||'').split(',').filter(Boolean);
+  let h='<div class="ficha'+(suja?' suja':'')+'" id="ficha-'+e.id+'">'+
+    '<div class="ficha-topo"><span class="tipo">'+esc(valor(e,'tipo')||p.tipo||'?')+'</span>'+
+    '<span style="flex:1;font-size:13px;color:var(--gray-5)">'+esc(valor(e,'local')||'(sem localização)')+'</span>'+
+    '<span class="pill '+(etapa==='producao'?'pill-verde':etapa==='tecnico'?'pill-cor':etapa==='campo'?'pill-ambar':'')+'">'+
+      esc((ETAPAS.find(function(x){ return x.id===etapa; })||{}).nome||etapa)+'</span></div>';
+  if(e.foraDaRevisao) h+='<div class="aviso-linha aviso-verm" style="border-radius:0">⚠️ Esta esquadria não está no PDF mais novo. Ela não foi apagada: confira com o comercial.</div>';
+  h+='<div class="ficha-corpo"><div>'+
+    '<div class="desenho" id="desenho-'+e.id+'">'+(e.croqui?'carregando croqui...':e.desenho?'carregando desenho...':'sem desenho no PDF')+'</div>'+
+    (e.croqui?'<div class="croqui-nome">Croqui: '+esc(e.croqui.nome)+'</div>':'')+
+    (ehConsulta()?'':'<div class="midia-botoes" style="margin-top:6px">'+
+      '<button class="btn btn-outline btn-sm" onclick="abrirEscolhaCroqui(\''+e.id+'\')">🖼 '+(e.croqui?'Trocar croqui':(e.desenho?'Usar outro croqui':'Escolher croqui'))+'</button>'+
+      (e.croqui&&e.desenho?'<button class="btn btn-outline btn-sm" onclick="voltarDesenhoDoPdf(\''+e.id+'\')">↩ Desenho do PDF</button>':
+        (e.croqui?'<button class="btn btn-outline btn-sm" onclick="voltarDesenhoDoPdf(\''+e.id+'\')">✕ Tirar croqui</button>':''))+'</div>')+
+    '<div class="proj"><b>Projeto:</b> '+esc(p.dimTxt||((p.dimL||'?')+' x '+(p.dimH||'?')))+(p.qtde?' · Qtde '+esc(p.qtde):'')+'<br>'+
+      (p.cor?'<b>Cor:</b> '+esc(p.cor)+'<br>':'')+(p.vidro?'<b>Vidro:</b> '+esc(p.vidro)+'<br>':'')+
+      (p.descricao?'<b>Descrição:</b> '+esc(p.descricao):'')+'</div>'+
+    (e.notas||[]).map(function(n){
+      return '<div class="nota-pdf'+(n.conjunto?' conjunto':'')+'">'+(n.conjunto?'<b>CONJUNTO '+esc(n.conjunto.join(' + '))+':</b> ':'<b>Anotação no PDF:</b> ')+esc(n.texto)+'</div>';
+    }).join('')+
+  '</div><div>';
+  h+='<div class="grade2">'+campoTxt(e,'tipo','Tipo','Ex.: P1')+campoTxt(e,'local','Localização','Ex.: Corredor')+'</div>';
+  h+='<div class="secao"><h4>Largura (mm)</h4><div class="grade">'+campoNum(e,'lCima','Em cima')+campoNum(e,'lMeio','No meio')+campoNum(e,'lBaixo','Embaixo')+'</div></div>';
+  h+='<div class="secao"><h4>Altura (mm)</h4><div class="grade">'+campoNum(e,'hEsq','Esquerda')+campoNum(e,'hCentro','Centro')+campoNum(e,'hDir','Direita')+'</div></div>';
+  h+='<div class="secao"><h4>Diagonais (mm)</h4><div class="grade2">'+campoNum(e,'d1','Diagonal 1')+campoNum(e,'d2','Diagonal 2')+'</div></div>';
+  h+='<div class="resultado'+(c.L===null||c.H===null?' incompleto':'')+'" id="vao-'+e.id+'">'+htmlVao(c)+'</div>';
+  h+='<div class="secao"><h4>Condição do vão</h4><div class="grade2"><div class="fg"><select data-e="'+e.id+'" data-c="condicao" onchange="digitou(this)"'+(ehConsulta()?' disabled':'')+'>'+
+    '<option value=""'+(cond?'':' selected')+'>— escolha —</option>'+
+    '<option value="liberado"'+(cond==='liberado'?' selected':'')+'>Liberado</option>'+
+    '<option value="nao"'+(cond==='nao'?' selected':'')+'>Não liberado</option></select></div></div>';
+  if(cond==='nao'){
+    h+='<div class="faltas">'+FALTAS.map(function(f){
+      return '<label><input type="checkbox" data-e="'+e.id+'" data-falta="'+f.id+'"'+(faltas.indexOf(f.id)>=0?' checked':'')+(ehConsulta()?' disabled':'')+' onchange="marcouFalta(this)"> '+esc(f.nome)+'</label>';
+    }).join('')+'</div>';
+    if(faltas.indexOf('outro')>=0) h+='<div style="margin-top:6px">'+campoTxt(e,'faltaOutro','O que mais falta','Descreva')+'</div>';
+  }
+  h+='</div>';
+  h+='<div class="secao"><h4>Observações</h4><div class="fg"><textarea data-e="'+e.id+'" data-c="obs" oninput="digitou(this)"'+(ehConsulta()?' disabled':'')+'>'+esc(valor(e,'obs'))+'</textarea></div></div>';
+  h+=htmlMidias(e);
+  h+='<div class="secao"><h4>Setor técnico</h4><div class="grade2">'+campoNum(e,'folgaL','Folga L')+campoNum(e,'folgaH','Folga H')+'</div>'+
+    '<div class="resultado'+(c.pL===null||c.pH===null?' incompleto':'')+'" id="prod-'+e.id+'">'+htmlProducao(c)+'</div>'+
+    (e.visto?'<div style="font-size:12px;color:var(--green);margin-top:6px">✔ Liberado para produção por <b>'+esc(e.visto.quem)+'</b> em '+esc(fmtQuando(e.visto.quando))+'</div>':'')+'</div>';
+  h+='<div class="secao"><h4>Etapa</h4><div class="fg"><select data-e="'+e.id+'" data-c="etapa" onchange="mudouEtapa(this)"'+(ehConsulta()?' disabled':'')+'>'+
+    ETAPAS.map(function(x){ return '<option value="'+x.id+'"'+(x.id===etapa?' selected':'')+'>'+esc(x.nome)+'</option>'; }).join('')+'</select></div>'+
+    '<div style="font-size:11.5px;color:var(--gray-4);margin-top:4px">Só vai ao técnico com o vão liberado e as medidas feitas; só vai à produção com a folga preenchida.</div></div>';
+  if(soAdmin() && (e.historico||[]).length){
+    h+='<div class="hist"><b>Histórico</b><br>'+e.historico.slice().reverse().slice(0,40).map(function(x){
+      return esc(fmtQuando(x.quando))+' · '+esc(x.quem)+' · '+esc(CAMPOS_FICHA[x.campo]||x.campo)+': '+esc(x.de===''?'(vazio)':x.de)+' → '+esc(x.para===''?'(vazio)':x.para);
+    }).join('<br>')+'</div>';
+  }
+  h+='</div></div></div>';
+  return h;
+}
+function htmlVao(c){
+  if(c.L===null&&c.H===null) return 'Medida do vão: digite as larguras e as alturas — vale a <b>menor</b> de cada sentido.';
+  return 'Medida do vão (a menor): <b>'+(c.L===null?'?':c.L)+' x '+(c.H===null?'?':c.H)+' mm</b>';
+}
+function htmlProducao(c){
+  if(c.pL===null||c.pH===null) return 'Medida de produção = vão − folga (preencha a folga).';
+  return 'Medida de produção: <b>'+c.pL+' x '+c.pH+' mm</b>';
+}
+async function mostrarDesenho(a,e){
+  const el=document.getElementById('desenho-'+e.id);
+  if(e.croqui){
+    try{
+      const src=await imagemDoCroqui(e.croqui.id);
+      const alvo=document.getElementById('desenho-'+e.id);
+      if(alvo) alvo.innerHTML='<img alt="Croqui '+esc(e.croqui.nome)+'" src="'+src+'">';
+    }catch(err){
+      const alvo=document.getElementById('desenho-'+e.id);
+      if(alvo) alvo.textContent='não consegui mostrar o croqui ('+(err&&err.message||err)+')';
+    }
+    return;
+  }
+  if(!e.desenho) return;
+  if(desenhoSuspeito(e.desenho)){ if(el) el.textContent='corrigindo o desenho...'; return; }
+  const o=obraPorId(a.ctoId);
+  const doc=(docsDeMedicao(o)).find(function(d){ return d.id===e.desenho.doc; }) ||
+            (a.origem&&a.origem.doc===e.desenho.doc?{id:a.origem.doc,url:a.origem.url,nome:a.origem.nome}:null);
+  if(!doc){ if(el) el.textContent='o PDF não está mais anexado na Obra'; return; }
+  try{
+    const src=await desenhoDe(doc,e.desenho);
+    const alvo=document.getElementById('desenho-'+e.id);
+    if(alvo) alvo.innerHTML='<img alt="Desenho '+esc(e.tipoPdf)+'" src="'+src+'">';
+  }catch(err){
+    const alvo=document.getElementById('desenho-'+e.id);
+    if(alvo) alvo.textContent='não consegui mostrar o desenho ('+(err&&err.message||err)+')';
+  }
+}
+async function verPdfOriginal(){
+  const a=acompDaObra(obraAberta);
+  if(!a||!a.origem) return;
+  try{ const u=await linkDoAnexo(a.origem.url,a.origem.nome); window.open(u,'_blank'); }
+  catch(e){ aviso('Não consegui abrir o PDF', e.message); }
+}
+function relerMedicao(){
+  if(temRascunho()){ aviso('Salve antes','Há medidas não salvas. Salve (ou descarte) antes de ler o PDF de novo.'); return; }
+  const o=obraPorId(obraAberta);
+  if(o) montarFichas(o,true);
+}
+
+// ================= DIGITAR E SALVAR =================
+function esquadriaNaTela(id){
+  const a=acompDaObra(obraAberta);
+  return a?a.esquadrias.find(function(e){ return e.id===id; }):null;
+}
+function anotar(id,campo,v){
+  const e=esquadriaNaTela(id); if(!e) return;
+  const base=baseFichas[id]||e;
+  if(!rascunho[id]) rascunho[id]={};
+  const orig=base[campo]==null?'':String(base[campo]);
+  if(String(v)===orig) delete rascunho[id][campo]; else rascunho[id][campo]=v;
+  if(!Object.keys(rascunho[id]).length) delete rascunho[id];
+}
+function digitou(el){
+  const id=el.getAttribute('data-e'), campo=el.getAttribute('data-c');
+  anotar(id,campo,el.value);
+  el.classList.toggle('mudou', !!(rascunho[id]&&Object.prototype.hasOwnProperty.call(rascunho[id],campo)));
+  const e=esquadriaNaTela(id);
+  if(e){
+    const c=contasDe(e);
+    const v=document.getElementById('vao-'+id); if(v){ v.innerHTML=htmlVao(c); v.classList.toggle('incompleto',c.L===null||c.H===null); }
+    const p=document.getElementById('prod-'+id); if(p){ p.innerHTML=htmlProducao(c); p.classList.toggle('incompleto',c.pL===null||c.pH===null); }
+    const f=document.getElementById('ficha-'+id); if(f) f.classList.toggle('suja',!!rascunho[id]);
+  }
+  // A condicao muda o que aparece (o que falta): redesenha so esta ficha.
+  if(campo==='condicao') redesenharFicha(id);
+  atualizarBarraSalvar();
+}
+function marcouFalta(el){
+  const id=el.getAttribute('data-e');
+  const e=esquadriaNaTela(id); if(!e) return;
+  const atual=String(valor(e,'faltas')||'').split(',').filter(Boolean);
+  const f=el.getAttribute('data-falta');
+  const nova=el.checked?(atual.indexOf(f)<0?atual.concat([f]):atual):atual.filter(function(x){ return x!==f; });
+  const ordenada=FALTAS.map(function(x){ return x.id; }).filter(function(x){ return nova.indexOf(x)>=0; });
+  anotar(id,'faltas',ordenada.join(','));
+  redesenharFicha(id);
+  atualizarBarraSalvar();
+}
+function mudouEtapa(el){
+  const id=el.getAttribute('data-e');
+  const e=esquadriaNaTela(id); if(!e) return;
+  const nova=el.value, c=contasDe(e);
+  if((nova==='tecnico'||nova==='producao') && valor(e,'condicao')!=='liberado'){
+    el.value=valor(e,'etapa')||'medir';
+    aviso('Ainda não','Só vai ao técnico com o vão marcado como "Liberado".'); return;
+  }
+  if((nova==='tecnico'||nova==='producao') && (c.L===null||c.H===null)){
+    el.value=valor(e,'etapa')||'medir';
+    aviso('Ainda não','Faltam as medidas do vão (pelo menos uma largura e uma altura).'); return;
+  }
+  if(nova==='producao' && (c.fL===null||c.fH===null)){
+    el.value=valor(e,'etapa')||'medir';
+    aviso('Ainda não','Só vai à produção com a folga L e a folga H preenchidas.'); return;
+  }
+  anotar(id,'etapa',nova);
+  redesenharFicha(id);
+  atualizarBarraSalvar();
+}
+function redesenharFicha(id){
+  const a=acompDaObra(obraAberta); if(!a) return;
+  const e=a.esquadrias.find(function(x){ return x.id===id; }); if(!e) return;
+  const el=document.getElementById('ficha-'+id); if(!el) return;
+  const foco=document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute('data-c');
+  const desenho=document.getElementById('desenho-'+id);
+  const img=desenho?desenho.innerHTML:'';
+  const t=document.createElement('div'); t.innerHTML=htmlFicha(a,e);
+  el.replaceWith(t.firstChild);
+  const d2=document.getElementById('desenho-'+id); if(d2&&img) d2.innerHTML=img;
+  preencherMiniaturas(document.getElementById('ficha-'+id));
+  if(foco){ const f=document.querySelector('#ficha-'+id+' [data-c="'+foco+'"]'); if(f) f.focus(); }
+}
+function temRascunho(){ return Object.keys(rascunho).length>0; }
+function atualizarBarraSalvar(){
+  const b=document.getElementById('barra-salvar');
+  const n=Object.keys(rascunho).length;
+  b.classList.toggle('visivel', n>0 && !!obraAberta);
+  document.getElementById('barra-salvar-txt').textContent=n===1?'1 esquadria com alteração não salva':n+' esquadrias com alteração não salva';
+}
+function descartarRascunho(){
+  if(!confirm('Descartar o que foi digitado e não salvo?')) return;
+  rascunho={}; baseFichas={};
+  render();
+}
+
+// Escolha quando eu e um colega mudamos o MESMO campo da mesma esquadria.
+function pedirEscolha(c){
+  return new Promise(function(ok){
+    const ov=document.getElementById('escolha-ov');
+    const fmt=function(v){ return v===''||v==null?'(vazio)':String(v); };
+    document.getElementById('escolha-corpo').innerHTML=
+      '<div style="font-size:13.5px;line-height:1.6"><b>'+esc(c.esq)+' · '+esc(CAMPOS_FICHA[c.campo]||c.campo)+'</b><br>'+
+      'Outra pessoa salvou um valor diferente enquanto você digitava. Qual fica?</div>'+
+      '<div class="escolha" id="esc-meu"><b>O meu:</b> '+esc(fmt(c.meu))+'</div>'+
+      '<div class="escolha" id="esc-deles"><b>O que está salvo'+(c.quem?' ('+esc(c.quem)+')':'')+':</b> '+esc(fmt(c.deles))+'</div>';
+    ov.classList.add('open');
+    document.getElementById('esc-meu').onclick=function(){ ov.classList.remove('open'); ok('meu'); };
+    document.getElementById('esc-deles').onclick=function(){ ov.classList.remove('open'); ok('deles'); };
+  });
+}
+
+// Salva a obra aberta. Junta campo a campo, por esquadria (mesma regra da
+// Fabrica): campo que so eu mudei vai; campo que so o colega mudou fica o
+// dele; os dois mudaram o mesmo campo -> pergunta. Nada de substituir a
+// esquadria inteira.
+async function salvarObra(){
+  if(!temRascunho()) return;
+  const btn=document.getElementById('btn-salvar'); btn.disabled=true;
+  const meu=copia(rascunho), base=copia(baseFichas);
+  let mudancas=0;
+  const deu=await alterar(async function(srv){
+    mudancas=0;
+    const a=srv.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    if(!a) return false;
+    const escolhas={};
+    for(const id of Object.keys(meu)){
+      const e=a.esquadrias.find(function(x){ return x.id===id; });
+      if(!e) continue;   // esquadria sumiu do banco: nao recria por conta propria
+      if(!Array.isArray(e.historico)) e.historico=[];
+      for(const campo of Object.keys(meu[id])){
+        const ref=base[id]&&base[id][campo]!=null?String(base[id][campo]):'';
+        const mine=String(meu[id][campo]);
+        const deles=e[campo]==null?'':String(e[campo]);
+        let fica;
+        if(deles===ref||deles===mine) fica=mine;
+        else {
+          const k=id+'|'+campo;
+          if(!escolhas[k]){
+            const ult=e.historico.slice().reverse().find(function(x){ return x.campo===campo; });
+            escolhas[k]=await pedirEscolha({esq:e.tipo||e.tipoPdf,campo:campo,meu:mine,deles:deles,quem:ult?ult.quem:''});
+          }
+          fica=escolhas[k]==='meu'?mine:deles;
+        }
+        if(fica===deles) continue;
+        e.historico.push({quando:agoraISO(),quem:usuario,campo:campo,de:deles,para:fica});
+        if(e.historico.length>200) e.historico=e.historico.slice(-200);
+        e[campo]=fica;
+        mudancas++;
+      }
+      // Regras da etapa conferidas de novo com o que ficou gravado.
+      const L=menor([e.lCima,e.lMeio,e.lBaixo]), H=menor([e.hEsq,e.hCentro,e.hDir]);
+      if((e.etapa==='tecnico'||e.etapa==='producao') && (e.condicao!=='liberado'||L===null||H===null)) e.etapa='campo';
+      if(e.etapa==='producao' && (mm(e.folgaL)===null||mm(e.folgaH)===null)) e.etapa='tecnico';
+      if(e.etapa==='producao' && !e.visto) e.visto={quem:usuario,quando:agoraISO()};
+      if(e.etapa!=='producao' && e.visto) e.visto=null;
+      if((!e.etapa||e.etapa==='medir') && L!==null && H!==null) e.etapa='campo';
+    }
+    if(!mudancas) return false;
+  }, function(){
+    const o=obraPorId(obraAberta)||{};
+    return {acao:'salvou medidas',alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''),detalhe:mudancas+' campo(s)'};
+  });
+  btn.disabled=false;
+  if(deu){ rascunho={}; baseFichas={}; render(); }
+  else if(!mudancas){
+    // O banco ja tinha exatamente o que estava na tela (ou o colega salvou o
+    // mesmo valor): nada a gravar, nada a perder.
+    rascunho={}; baseFichas={}; render(); status('🟢 Já estava salvo · '+agoraHora());
+  }
+}
+
+window.addEventListener('beforeunload',function(ev){
+  if(temRascunho() || _visitaNovas.length || _gravador){ ev.preventDefault(); ev.returnValue=''; }
+});
+
+// ================= ABERTURA =================
+function abrirApp(nome,papelDoUsuario){
+  usuario=nome;
+  papel=String(papelDoUsuario||'').toLowerCase();
+  acaoSessao('sessao-entrar',{sistema:'acompanhamento'}).catch(function(){});
+  if(!_checkSessao) _checkSessao=setInterval(checkForceLogout,5000);
+  document.getElementById('bloqueio').style.display='none';
+  document.getElementById('app').style.display='block';
+  lerLocal();
+  try{ const a=sessionStorage.getItem('dalum-acomp-aberta'); if(a) obraAberta=a; }catch(e){}
+  render();
+  sincronizar();
+  document.getElementById('aviso-ov').addEventListener('click',function(e){ if(e.target===this) fecharAviso(); });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape' && document.getElementById('aviso-ov').classList.contains('open')) fecharAviso();
+  });
+  // Busca alteracoes de colegas a cada 60 s. Com medida digitada e nao salva,
+  // os dados chegam mas a tela nao e redesenhada por baixo de quem digita: a
+  // juncao acontece no Salvar.
+  setInterval(function(){ atualizarDoBanco(); },60000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) atualizarDoBanco(); });
+}
+async function atualizarDoBanco(){
+  if(_gravando) return;
+  if(temRascunho()){
+    try{
+      const versao=_versaoLocal;
+      const d=await buscarRemoto();
+      if(d && !_gravando && versao===_versaoLocal){ dados=d; gravarLocal(); status('🟡 Há alteração não salva · '+agoraHora()); }
+    }catch(e){}
+    return;
+  }
+  const foco=document.activeElement;
+  if(foco && /INPUT|TEXTAREA|SELECT/.test(foco.tagName) && foco.id!=='busca') return;
+  sincronizar();
+}
+
+(function iniciar(){
+  const t=lerToken();
+  if(t){ abrirApp(t.dados.n||t.dados.u||'usuário', t.dados.r); return; }
+  const sso=lerSSO();
+  if(sso){ abrirApp(sso.nome, sso.role); return; }
+  // Sem cracha: vai para o portal, o unico lugar onde se entra.
+  try{ (window.top||window).location.replace(PORTAL_URL); }
+  catch(e){ window.location.replace(PORTAL_URL); }
+})();
+</script>
+</body>
+</html>
