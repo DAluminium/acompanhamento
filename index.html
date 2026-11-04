@@ -70,10 +70,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .faltas label{display:flex;align-items:center;gap:5px;cursor:pointer}
 .nota-pdf{background:#FFF8E1;border-left:3px solid var(--amber);padding:6px 10px;border-radius:4px;font-size:12.5px;margin-top:6px}
 .nota-pdf.conjunto{background:#FDECEA;border-left-color:var(--red)}
+.nota-pdf{position:relative;padding-right:34px}
+.nota-x{position:absolute;top:50%;right:4px;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gray-3,#ccc);border-radius:50%;background:#fff;color:var(--red);font-size:16px;line-height:1;cursor:pointer;padding:0}
 .depois{font-size:12px;color:var(--gray-4);font-style:italic}
 .fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
 .foto{position:relative;background:var(--gray-1);border:1px solid var(--gray-2);border-radius:8px;overflow:hidden}
-.foto img{display:block;width:100%;height:110px;object-fit:cover;cursor:zoom-in;background:var(--gray-2)}
+.foto img{display:block;width:100%;height:110px;object-fit:contain;cursor:zoom-in;background:var(--gray-2)}
 .foto-leg{font-size:10.5px;color:var(--gray-5);padding:4px 6px;line-height:1.35}
 .foto-leg a{color:var(--cor-dark)}
 .foto-x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:16px;line-height:26px;cursor:pointer}
@@ -194,6 +196,8 @@ catch(e){ document.documentElement.classList.add('dentro-do-portal'); }
 <div class="overlay" id="croqui-ov" style="z-index:310">
   <div class="modal" style="width:min(820px,100%)">
     <div class="modal-head" style="display:flex;align-items:center;gap:8px"><div class="modal-title" style="flex:1">Croquis</div>
+      <button class="btn btn-cor btn-sm" onclick="document.getElementById('croqui-arq').click()" title="Usar uma imagem salva no computador ou no celular">💻 Do computador</button>
+      <input type="file" id="croqui-arq" accept="image/*" style="display:none" onchange="croquiDoComputador(this)">
       <button class="btn btn-outline btn-sm" onclick="fecharEscolhaCroqui()">Fechar</button></div>
     <div class="modal-body" id="croqui-corpo"></div>
   </div>
@@ -707,7 +711,9 @@ async function lerSmartCem(doc){
   const rotulos=itens.filter(function(i){ return /^tipo:?$/i.test(i.t); })
     .sort(function(a,b){ return a.p-b.p || a.y-b.y; });
   // Onde comeca o conteudo de cada pagina: depois do cabecalho da proposta.
-  const CABECALHO=/^(prazo de execu|validade|emitido por|obra:|proposta|cliente:|contato:|end\. obra|cidade:|cep:|cpf:|telefone:|e-mail:)/i;
+  // (o Djalma tem "Endereco:", "Tratamento:" geral e "Medidas de L x H
+  // referem-se ao: Marco" no cabecalho — esta ultima vem por ultimo)
+  const CABECALHO=/^(prazo de execu|validade|emitido por|obra:|proposta|cliente:|contato:|end\. obra|endere[cç]o:|cidade:|cep:|cpf:|telefone:|e-mail:|medidas de l)/i;
   const inicioPagina={};
   rotulos.forEach(function(r){
     if(inicioPagina[r.p]!==undefined) return;
@@ -718,19 +724,51 @@ async function lerSmartCem(doc){
     const rod=itens.filter(function(i){ return i.p===p && /smartcem|alumisoft/i.test(i.t); }).map(function(i){ return i.y; });
     return (rod.length?Math.min.apply(null,rod):alturaPag[p]||842)-20;
   };
+  // Modelo B com linhas de unidade (proposta do Djalma, 04/11/2026): logo
+  // abaixo da linha do "Tipo" vem uma linha por unidade ("1/1", "1/3",
+  // "2/3"...), e o medidor anota em cima delas. O bloco vai ate a ultima
+  // dessas linhas — antes acabava na linha do "Tipo" e as anotacoes caiam na
+  // esquadria de baixo.
+  const ehLinhaDeUnidade=function(i,r){ return /^\d+\/\d+$/.test(i.t) && i.x<r.x-30; };
+  const fimDasUnidades=function(r,p,desde){
+    let fim=desde;
+    for(;;){
+      const u=itens.find(function(i){ return i.p===p && ehLinhaDeUnidade(i,r) && i.y>=fim-6 && i.y<=fim+16; });
+      if(!u) return fim;
+      fim=u.y+12;
+    }
+  };
+  const fimDoBlocoB=function(r){ return fimDasUnidades(r,r.p,r.y+22); };
+  // Linha do "Tipo" no pe da pagina, com os valores e as unidades no alto da
+  // pagina seguinte (a P7 do Djalma): esse pedaco de cima ("cauda") e dela.
+  const caudas={};
+  rotulos.forEach(function(r){
+    const temValor=itens.some(function(i){ return i.p===r.p && i.y>r.y+6 && i.y<r.y+30 && Math.abs(i.x-r.x)<=15; });
+    if(temValor || r.p>=pdf.numPages) return;
+    const p=r.p+1, ini=inicioPagina[p]!==undefined?inicioPagina[p]:0;
+    const primeira=itens.filter(function(i){ return i.p===p && i.y>=ini && i.y<=ini+30 && /^CEM$/i.test(i.t) && i.x<r.x-30; })
+      .sort(function(a,c){ return a.y-c.y; })[0];
+    if(!primeira) return;
+    caudas[rotulos.indexOf(r)]={p:p,y0:ini,y1:fimDasUnidades(r,p,primeira.y+12),vy:primeira.y};
+  });
+  const fimDaCauda={};
+  Object.keys(caudas).forEach(function(k){ fimDaCauda[caudas[k].p]=caudas[k].y1; });
   const blocos=rotulos.map(function(r,k){
     const linha=itens.filter(function(i){ return i.p===r.p && igual(i.y,r.y) && i.x>r.x; });
     const modeloB=linha.some(function(i){ return /^(l|h|qtd):?$/i.test(i.t); });
     const ant=rotulos[k-1], prox=rotulos[k+1];
     if(modeloB){
-      return {r:r,p:r.p,modelo:'B',linha:linha,
-        y0:(ant&&ant.p===r.p)?ant.y+22:inicioPagina[r.p],
-        y1:r.y+22};
+      const c=caudas[k]||null;
+      return {r:r,p:r.p,modelo:'B',linha:linha,cauda:c,
+        valores:c?{p:c.p,y0:c.vy-6,y1:c.vy+6}:null,
+        y0:(ant&&ant.p===r.p)?fimDoBlocoB(ant):Math.max(inicioPagina[r.p]||0,fimDaCauda[r.p]||0),
+        y1:fimDoBlocoB(r)};
     }
     return {r:r,p:r.p,modelo:'A',linha:linha,
       y0:r.y-12, y1:(prox&&prox.p===r.p)?prox.y-12:fimPagina(r.p)};
   });
-  const noBloco=function(b){ return itens.filter(function(i){ return i.p===b.p && i.y>=b.y0 && i.y<b.y1; }); };
+  const naCauda=function(b,i){ return !!b.cauda && i.p===b.cauda.p && i.y>=b.cauda.y0 && i.y<b.cauda.y1; };
+  const noBloco=function(b){ return itens.filter(function(i){ return (i.p===b.p && i.y>=b.y0 && i.y<b.y1) || naCauda(b,i); }); };
   // Junta pedacos da mesma linha; sem espaco quando um encosta no outro
   // ("J0" + "4" = "J04").
   const juntar=function(lista){
@@ -753,12 +791,16 @@ async function lerSmartCem(doc){
       return {txt:juntar(v),r:r};
     };
     let tipo='', local='', qtde='', dimL='', dimH='', dimTxt='', cor='', vidro='', descricao='', linhaProd='';
-    const linhaValores=its.filter(function(i){ return i.y>b.r.y+6 && i.y<b.r.y+30 && i.h<LETRA_ANOTACAO; });
+    const lv=b.valores||{p:b.p,y0:b.r.y+6,y1:b.r.y+30};
+    const linhaValores=its.filter(function(i){ return i.p===lv.p && i.y>lv.y0 && i.y<lv.y1 && i.h<LETRA_ANOTACAO; });
+    const notasDoBloco=[];
     const naColuna=function(de,ate){ return linhaValores.filter(function(i){ return i.x>=de && i.x<ate; }).sort(function(a,c){ return a.x-c.x; }); };
     linhaValores.forEach(function(i){ usados.add(i); });
     b.linha.forEach(function(i){ usados.add(i); }); usados.add(b.r);
     if(b.modelo==='B'){
-      const col=function(re,padrao){ const i=b.linha.find(function(x){ return re.test(x.t); }); return i?i.x:padrao; };
+      // Rotulo repetido (no Djalma ha L e H do Contramarco e da Esquadria):
+      // vale o da direita, o da Esquadria.
+      const col=function(re,padrao){ const i=b.linha.filter(function(x){ return re.test(x.t); }).sort(function(a,c){ return c.x-a.x; })[0]; return i?i.x:padrao; };
       const xQtd=col(/^qtd/i,b.r.x+60), xL=col(/^l:?$/i,xQtd+57), xH=col(/^h:?$/i,xL+48), xLin=col(/^linha/i,xH+62), xLoc=col(/^localiza/i,xLin+90);
       tipo=juntar(naColuna(b.r.x-15,xQtd-6));
       qtde=juntar(naColuna(xQtd-8,xL-8));
@@ -767,19 +809,54 @@ async function lerSmartCem(doc){
       linhaProd=juntar(naColuna(xLin-10,xLoc-20));
       local=juntar(naColuna(xLoc-20,99999));
       dimTxt=dimL&&dimH?dimL+' x '+dimH:'';
-      const ac=aoLado(/^acabamento/i);
+      // No Djalma a cor vem como "Tratamento:", e ha "Linha:" e "Obs:" em cima
+      // (os rotulos de cima: acima da linha do "Tipo").
+      const acima=its.filter(function(i){ return i.p===b.p && i.y<b.r.y-4; });
+      const rotAcima=function(re){ return acima.find(function(i){ return re.test(i.t); })||null; };
+      let ac=aoLado(/^acabamento/i);
+      if(!ac.r && rotAcima(/^tratamento:?$/i)) ac=aoLado(/^tratamento:?$/i);
       cor=ac.txt;
       const vi=aoLado(/^vidros?:?$/i);
       vidro=vi.txt;
       if(!vidro){ const sv=its.find(function(i){ return /^sem vidros?$/i.test(i.t); }); if(sv){ vidro='Sem vidros'; usados.add(sv); } }
-      // Descricao: o texto de cima, antes do "Acabamento:" (pode ter varias linhas).
-      const limite=ac.r?ac.r.y-2:b.r.y-2;
+      const ladoDe=function(r){
+        if(!r) return ''; usados.add(r);
+        const v=its.filter(function(i){ return i.p===r.p && igual(i.y,r.y) && i.x>r.x && i.h<LETRA_ANOTACAO; }).sort(function(a,c){ return a.x-c.x; });
+        v.forEach(function(i){ usados.add(i); }); return juntar(v);
+      };
+      const li=ladoDe(rotAcima(/^linha:?$/i)); if(!linhaProd) linhaProd=li;
+      const obs=ladoDe(rotAcima(/^obs:?$/i));
+      // Descricao: o texto de cima, antes do primeiro rotulo ("Acabamento:",
+      // "Vidros:"...) — pode ter varias linhas.
+      const rotsDeCima=[ac.r,vi.r,rotAcima(/^linha:?$/i),rotAcima(/^obs:?$/i)].filter(Boolean).map(function(i){ return i.y; });
+      const limite=rotsDeCima.length?Math.min.apply(null,rotsDeCima)-2:b.r.y-2;
       const desc=its.filter(function(i){
-        return i.y<limite && i.x>=b.r.x-10 && i.h<LETRA_ANOTACAO && !usados.has(i) && !/:$/.test(i.t);
+        return i.p===b.p && i.y<limite && i.x>=b.r.x-10 && i.h<LETRA_ANOTACAO && !usados.has(i) && !/:$/.test(i.t);
       }).sort(function(a,c){ return a.y-c.y || a.x-c.x; });
       const porLinha=[]; desc.forEach(function(i){ const l=porLinha.find(function(x){ return igual(x.y,i.y); }); if(l) l.its.push(i); else porLinha.push({y:i.y,its:[i]}); });
       descricao=porLinha.map(function(l){ return juntar(l.its); }).join(' ');
       desc.forEach(function(i){ usados.add(i); });
+      if(obs) descricao+=' · Obs: '+obs;
+      // Anotacao feita em cima de uma linha de unidade ("2/3"): vira
+      // "J3.2: 601X752 - MEIO", como o medidor escreve nos outros PDFs, para
+      // a ficha da unidade receber a anotacao dela. Com uma unidade so:
+      // "Medido: 1460X4311 - FACHADA".
+      its.filter(function(i){ return ehLinhaDeUnidade(i,b.r); }).sort(function(a,c){ return a.p-c.p || a.y-c.y; }).forEach(function(u){
+        const m=u.t.match(/^(\d+)\/(\d+)$/), un=parseInt(m[1],10), de=parseInt(m[2],10);
+        const gr=its.filter(function(i){ return i.p===u.p && igual(i.y,u.y) && i.h>=LETRA_ANOTACAO; }).sort(function(a,c){ return a.x-c.x; });
+        if(!gr.length) return;
+        gr.forEach(function(i){ usados.add(i); });
+        let q='', nums=[], resto=[];
+        gr.forEach(function(i,k){
+          if(k===0 && /^\d+$/.test(i.t) && i.x<xL-40) q=i.t;
+          else if(/^\d+$/.test(i.t) && nums.length<2 && !resto.length) nums.push(i.t);
+          else resto.push(i.t);
+        });
+        let t=nums.length===2?nums[0]+'X'+nums[1]:nums.join(' ');
+        if(resto.length) t+=(t?' - ':'')+resto.join(' ');
+        if(q && q!=='1') t+=' (qtde '+q+')';
+        notasDoBloco.push({texto:(de>1?(tipo||'?')+'.'+un+': ':'Medido: ')+t});
+      });
     } else {
       const cab=function(re){ return b.linha.find(function(i){ return re.test(i.t); }); };
       const cLoc=cab(/^localiza/i), cDim=cab(/^dimens/i), cQtd=cab(/^qtde?/i);
@@ -814,19 +891,22 @@ async function lerSmartCem(doc){
     let desenho=null;
     if(cand){
       const x0=Math.max(0,cand.x), x1=Math.min(cand.x+cand.w,b.r.x-3);
-      const y0=Math.max(cand.y,b.y0-4), y1=Math.min(cand.y+cand.h,b.y1);
+      // Primeira esquadria da pagina: o desenho pode subir um pouco alem do
+      // fim do cabecalho (a PV_1 do Djalma); folga maior para nao cortar.
+      const folga=(b.y0===inicioPagina[b.p])?16:4;
+      const y0=Math.max(cand.y,b.y0-folga), y1=Math.min(cand.y+cand.h,b.y1);
       if(x1-x0>=30 && y1-y0>=30) desenho={p:cand.p,x:x0,y:y0,w:x1-x0,h:y1-y0};
     }
     return {
       tipo:tipo, local:local, qtde:qtde, linha:linhaProd,
       dimL:dimL, dimH:dimH, dimTxt:dimTxt,
       cor:cor, vidro:vidro, descricao:descricao.replace(/\s+/g,' ').trim(),
-      desenho:desenho, notas:[]
+      desenho:desenho, notas:notasDoBloco
     };
   });
   // Anotacoes: texto em letra maior que nao e de nenhum campo e cai DENTRO de
   // um bloco. Pedacos vizinhos viram uma nota so.
-  const blocoDe=function(i){ return blocos.findIndex(function(b){ return b.p===i.p && i.y>=b.y0 && i.y<b.y1; }); };
+  const blocoDe=function(i){ return blocos.findIndex(function(b){ return (b.p===i.p && i.y>=b.y0 && i.y<b.y1) || naCauda(b,i); }); };
   const soltos=itens.filter(function(i){ return !usados.has(i) && i.h>=LETRA_ANOTACAO && blocoDe(i)>=0; })
     .sort(function(a,b){ return a.p-b.p || a.y-b.y || a.x-b.x; });
   const notas=[];
@@ -928,7 +1008,9 @@ function reduzirFoto(arquivo){
       const f=Math.min(1,1600/maior);
       const c=document.createElement('canvas');
       c.width=Math.round(im.naturalWidth*f); c.height=Math.round(im.naturalHeight*f);
-      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      // Fundo branco: croqui em PNG com fundo transparente ficaria preto no JPEG.
+      const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height);
+      g.drawImage(im,0,0,c.width,c.height);
       URL.revokeObjectURL(u);
       c.toBlob(function(b){ b?ok(b):falhou(new Error('não consegui reduzir a foto')); },'image/jpeg',0.7);
     };
@@ -1029,6 +1111,34 @@ async function tirarDaEsquadria(esqId, lista, itemId, rotulo){
     e.historico.push({quando:agoraISO(),quem:usuario,campo:lista,de:it.nome,para:'(tirado)'});
   },{acao:'tirou '+rotulo, alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:it.nome});
   if(deu){ excluirArquivoDoAnexo(it.url); redesenharFicha(esqId); }
+}
+
+// ---- ANOTACAO DO PDF QUE VEIO ERRADA (pedido de 04/11/2026) ----
+// O leitor as vezes pega a anotacao da esquadria vizinha. A anotacao nao e
+// apagada da lista: o texto vai para "notasTiradas" e some da tela e dos PDFs.
+// Assim continua tirada mesmo quando alguem le o PDF de novo.
+function notaTirada(e,n){ return (e.notasTiradas||[]).indexOf(String(n.texto||''))>=0; }
+function notasVisiveis(e){ return (e.notas||[]).filter(function(n){ return !notaTirada(e,n); }); }
+async function tirarNota(esqId, i){
+  if(recusarSeConsulta()) return;
+  const a0=acompDaObra(obraAberta);
+  const e0=a0&&a0.esquadrias.find(function(x){ return x.id===esqId; });
+  const n0=e0&&(e0.notas||[])[i];
+  if(!n0) return;
+  const texto=String(n0.texto||'');
+  if(!await perguntar('Tirar esta anotação?','"'+texto+'"\n\nEla some desta ficha e dos PDFs. Use quando a anotação veio de outra esquadria.','Tirar',true)) return;
+  const o=obraPorId(obraAberta)||{};
+  const deu=await alterar(function(base){
+    const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
+    const e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(!e) return false;
+    if(!Array.isArray(e.notasTiradas)) e.notasTiradas=[];
+    if(e.notasTiradas.indexOf(texto)>=0) return false;
+    e.notasTiradas.push(texto);
+    if(!Array.isArray(e.historico)) e.historico=[];
+    e.historico.push({quando:agoraISO(),quem:usuario,campo:'anotação do PDF',de:texto,para:'(tirada)'});
+  },{acao:'tirou anotação do PDF', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:(e0.tipo||e0.tipoPdf||'')+': '+texto});
+  if(deu) redesenharFicha(esqId);
 }
 
 async function recebeuFotos(input){
@@ -1418,7 +1528,10 @@ function nomeArquivo(t){ return String(t||'').normalize('NFD').replace(/[̀-ͯ]/
 function txt(v){ return v==null?'':String(v); }
 // Carrega uma imagem (dataURL ou endereco local) ja RECORTADA na proporcao
 // pedida, como foto de quadro: preenche tudo, corta as sobras.
-function imagemRecortada(src,proporcao,larguraPx){
+// inteira=true: nao corta nada; a imagem cabe inteira no espaco, com faixas
+// cinza claro nas sobras (foto do vao: a data e a hora que o aplicativo de
+// camera escreve embaixo nao podem sumir — pedido de 04/11/2026).
+function imagemRecortada(src,proporcao,larguraPx,inteira){
   return new Promise(function(ok,falhou){
     const im=new Image();
     im.onload=function(){
@@ -1427,6 +1540,12 @@ function imagemRecortada(src,proporcao,larguraPx){
       const g=c.getContext('2d');
       const ri=im.naturalWidth/im.naturalHeight;
       let sw=im.naturalWidth, sh=im.naturalHeight, sx=0, sy=0;
+      if(inteira){
+        let dw=W, dh=W/ri; if(dh>H){ dh=H; dw=H*ri; }
+        g.fillStyle='#eef0f2'; g.fillRect(0,0,W,H);
+        g.drawImage(im,0,0,sw,sh,(W-dw)/2,(H-dh)/2,dw,dh);
+        ok(c.toDataURL('image/jpeg',0.82)); return;
+      }
       if(ri>proporcao){ sw=sh*proporcao; sx=(im.naturalWidth-sw)/2; } else { sh=sw/proporcao; sy=(im.naturalHeight-sh)/2; }
       g.fillStyle='#fff'; g.fillRect(0,0,W,H);
       g.drawImage(im,sx,sy,sw,sh,0,0,W,H);
@@ -1467,7 +1586,7 @@ function pdfMarca(pdf,x,y,marcado,rot){
   pdf.setFont('helvetica','normal'); pdf.setFontSize(8.5); pdf.setTextColor.apply(pdf,COR_TEXTO); pdf.text(rot,x+4,y);
 }
 async function fotoParaPdf(f,proporcao){
-  try{ const u=await miniatura(f.url,f.nome); return await imagemRecortada(u,proporcao,900); }catch(e){ return null; }
+  try{ const u=await miniatura(f.url,f.nome); return await imagemRecortada(u,proporcao,900,true); }catch(e){ return null; }
 }
 function baixarPdf(pdf,nome){ pdf.save(nome); }
 
@@ -1525,7 +1644,7 @@ async function gerarFichaPdf(emBranco){
     // Croqui escolhido manda sobre o desenho do PDF.
     if(e.croqui || (e.desenho&&doc)){
       try{
-        const src=e.croqui?await imagemDoCroqui(e.croqui.id):await desenhoDe(doc,e.desenho);
+        const src=e.croqui?await imagemDoCroquiDe(e.croqui):await desenhoDe(doc,e.desenho);
         const t=await tamanhoDaImagem(src);
         // Em JPEG com fundo branco: o PNG entrava no PDF com uns 400 KB cada
         // desenho e a ficha passava de 1 MB com 3 esquadrias (pesado para o
@@ -1538,7 +1657,7 @@ async function gerarFichaPdf(emBranco){
     ye+=40;
     const bloco=function(rot,val){ if(!val) return; pdfRotulo(pdf,rot,12,ye); ye+=3.6; const n=pdfValor(pdf,val,12,ye,8,false,58); ye+=n*3.4+1.5; };
     bloco('Descrição',p.descricao); bloco('Cor',p.cor); bloco('Vidro',p.vidro);
-    (e.notas||[]).forEach(function(n){
+    notasVisiveis(e).forEach(function(n){
       const t=n.conjunto?('Conjunto '+n.conjunto.join(' + ')+' · '+n.texto):('Anotado na proposta: '+n.texto);
       pdf.setFont('helvetica',n.conjunto?'bold':'normal'); pdf.setFontSize(7.5);
       const linhas=pdf.splitTextToSize(t,55);
@@ -1880,19 +1999,51 @@ async function escolherCroqui(id){
   fecharEscolhaCroqui();
   await trocarCroqui(esqId,{id:c.id,nome:c.nome});
 }
+// Croqui que nao esta na biblioteca: imagem do computador/celular (pedido de
+// 04/11/2026). Sobe como as fotos dos vaos (arquivo privado, so desta ficha);
+// NAO entra na biblioteca. Guardado como {id:'pc', nome, url, ...}.
+async function croquiDoComputador(input){
+  const f=(input.files||[])[0]; input.value='';
+  if(!f || recusarSeConsulta()) return;
+  const esqId=_escolhaCroqui.esqId;
+  const e=esquadriaNaTela(esqId); if(!e) return;
+  fecharEscolhaCroqui();
+  status('🖼 Enviando o croqui...');
+  let url='';
+  try{
+    const reduzida=await reduzirFoto(f);
+    const nomeArq=(e.tipo||e.tipoPdf||'vao')+'_croqui_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.jpg';
+    const j=await enviarArquivoPrivado(reduzida,'image',nomeArq);
+    url=j.secure_url;
+    const nome=String(f.name||'imagem').replace(/\.[a-z0-9]+$/i,'')+' (do computador)';
+    await trocarCroqui(esqId,{id:'pc',nome:nome,url:url,arquivo:nomeArq,quem:usuario,quando:agoraISO()});
+    const a=acompDaObra(obraAberta), e2=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
+    if(!(e2&&e2.croqui&&e2.croqui.url===url)) excluirArquivoDoAnexo(url);
+  }catch(err){
+    if(url) excluirArquivoDoAnexo(url);
+    status('');
+    aviso('Croqui não enviado','"'+(f.name||'imagem')+'": '+err.message+'\n\nConfira a internet e tente de novo.');
+  }
+}
+// Imagem do croqui: da biblioteca (pelo codigo) ou do computador (arquivo
+// privado, aberto como as fotos).
+function imagemDoCroquiDe(c){ return c.url?miniatura(c.url,c.arquivo||c.nome):imagemDoCroqui(c.id); }
 // Grava direto (nao passa pelo rascunho das medidas), como as fotos.
 async function trocarCroqui(esqId,croqui){
   const o=obraPorId(obraAberta)||{};
+  let arquivoSaiu='';   // croqui do computador que foi trocado: sai da nuvem
   const deu=await alterar(function(base){
     const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
     const e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
     if(!e) return false;
     const antes=e.croqui?e.croqui.nome:'(desenho do PDF)';
+    if(e.croqui&&e.croqui.url) arquivoSaiu=e.croqui.url;
     if(croqui) e.croqui=croqui; else { if(!e.croqui) return false; delete e.croqui; }
     if(!Array.isArray(e.historico)) e.historico=[];
     e.historico.push({quando:agoraISO(),quem:usuario,campo:'croqui',de:antes,para:croqui?croqui.nome:'(desenho do PDF)'});
   },{acao:croqui?'escolheu croqui':'voltou ao desenho do PDF', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''), detalhe:croqui?croqui.nome:''});
   if(deu){
+    if(arquivoSaiu && !(croqui&&croqui.url===arquivoSaiu)) excluirArquivoDoAnexo(arquivoSaiu);
     redesenharFicha(esqId);
     // redesenharFicha reaproveita a imagem antiga; aqui o desenho mudou.
     const a=acompDaObra(obraAberta), e=a&&a.esquadrias.find(function(x){ return x.id===esqId; });
@@ -2343,8 +2494,10 @@ function htmlFicha(a,e){
     '<div class="proj"><b>Projeto:</b> '+esc(p.dimTxt||((p.dimL||'?')+' x '+(p.dimH||'?')))+(p.unidades?' · unidade '+p.unidade+' de '+p.unidades:(p.qtde?' · Qtde '+esc(p.qtde):''))+'<br>'+
       (p.cor?'<b>Cor:</b> '+esc(p.cor)+'<br>':'')+(p.vidro?'<b>Vidro:</b> '+esc(p.vidro)+'<br>':'')+
       (p.descricao?'<b>Descrição:</b> '+esc(p.descricao):'')+'</div>'+
-    (e.notas||[]).map(function(n){
-      return '<div class="nota-pdf'+(n.conjunto?' conjunto':'')+'">'+(n.conjunto?'<b>CONJUNTO '+esc(n.conjunto.join(' + '))+':</b> ':'<b>Anotação no PDF:</b> ')+esc(n.texto)+'</div>';
+    (e.notas||[]).map(function(n,i){
+      if(notaTirada(e,n)) return '';
+      return '<div class="nota-pdf'+(n.conjunto?' conjunto':'')+'">'+(n.conjunto?'<b>CONJUNTO '+esc(n.conjunto.join(' + '))+':</b> ':'<b>Anotação no PDF:</b> ')+esc(n.texto)+
+        (ehConsulta()?'':'<button class="nota-x" title="Tirar esta anotação (veio errada do PDF)" onclick="tirarNota(\''+e.id+'\','+i+')">×</button>')+'</div>';
     }).join('')+
   '</div><div>';
   h+='<div class="grade2">'+campoTxt(e,'tipo','Tipo','Ex.: P1')+campoTxt(e,'local','Localização','Ex.: Corredor')+'</div>';
@@ -2392,7 +2545,7 @@ async function mostrarDesenho(a,e){
   const el=document.getElementById('desenho-'+e.id);
   if(e.croqui){
     try{
-      const src=await imagemDoCroqui(e.croqui.id);
+      const src=await imagemDoCroquiDe(e.croqui);
       const alvo=document.getElementById('desenho-'+e.id);
       if(alvo) alvo.innerHTML='<img alt="Croqui '+esc(e.croqui.nome)+'" src="'+src+'">';
     }catch(err){
@@ -2447,7 +2600,7 @@ async function zerarFichas(){
   const deu=await alterar(function(base){
     const a=base.acompanhamentos.find(function(x){ return x.ctoId===obraAberta; });
     if(!a||!a.esquadrias.length) return false;
-    a.esquadrias.forEach(function(e){ (e.fotos||[]).concat(e.audios||[]).forEach(function(f){ if(f.url) arquivos.push(f.url); }); });
+    a.esquadrias.forEach(function(e){ (e.fotos||[]).concat(e.audios||[]).concat(e.croqui&&e.croqui.url?[e.croqui]:[]).forEach(function(f){ if(f.url) arquivos.push(f.url); }); });
     a.esquadrias=[]; delete a.origem; a.avisos=[];
     a.zeradoPor=usuario; a.zeradoEm=agoraISO();
   },{acao:'zerou as fichas', alvo:(o.ct?o.ct+' · ':'')+(o.cliente||''),
